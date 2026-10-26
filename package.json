@@ -1,0 +1,15 @@
+{
+  "name": "nordic-line",
+  "version": "0.1.0",
+  "private": true,
+  "description": "An original 3D ski and snowboard game with open Nordic resort geography.",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/core.test.mjs",
+    "start": "python3 launch.py",
+    "serve": "python3 launch.py --no-browser --port 8000"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

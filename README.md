@@ -10,7 +10,7 @@ An original 3D skiing and snowboarding prototype with real Nordic resort geograp
 
 On this Mac, double-click **Start Nordic Line.command**. It opens the game in your browser. Keep its Terminal window open while playing; close it or press Ctrl+C to stop.
 
-Alternatively, run `python3 launch.py` from this folder. Python 3 is the only launcher requirement; there are no Python packages or JavaScript dependencies to install. A modern browser with WebGL2 support is needed. Opening `index.html` directly without the launcher will not work because browsers restrict local module/data loading.
+Alternatively, run `python3 launch.py` from this folder. Python 3 is the only launcher requirement. On first use, the launcher downloads pinned Three.js and Leaflet files from their published npm distributions and verifies SHA-256 checksums. There are no package-install commands to run. Later launches reuse those files. A modern browser with WebGL2 support is needed. Opening `index.html` directly without the launcher will not work because browsers restrict local module/data loading.
 
 Choose a resort by clicking its map marker or searching by name. Pick a slope, select skis or snowboard, and choose **Ride this line**. The circular map opens the picker again. Grey markers are location records without downhill line geometry in this snapshot, so riding is disabled for them.
 
@@ -52,7 +52,7 @@ Snapshot downloaded **26 October 2026**, from the public OpenSkiData downloads. 
 
 **387 records contain mapped downhill line segments.** The extract includes **5,187 slope-segment associations and 1,886 lift-segment associations**. Some features belong to multiple ski-area records, some records overlap, and one signed slope can be split into many segments. These are dataset counts, not a claim of 569 unique fully surveyed resorts or 5,187 complete signed slopes. Short segments under 10 m are not offered in the slope dropdown. Coverage depends on the source mapping; metadata records without mapped lines are explicitly marked “Location only.”
 
-All resort/vector data and country outlines are bundled locally. Eight resorts also have bundled Mapterhorn elevation grids: **Åre, Trysil, Hemsedal, Hafjell, Levi, Ruka, Hlíðarfjall and Himosvuori**. Those eight work without internet after the launcher starts.
+All resort/vector data and country outlines are bundled locally. Eight resorts also have bundled Mapterhorn elevation grids: **Åre, Trysil, Hemsedal, Hafjell, Levi, Ruka, Hlíðarfjall and Himosvuori**. Those eight work without internet after the first launch has downloaded the browser libraries.
 
 Other resorts request Mapterhorn elevation tiles on demand. If the elevation request fails, the prototype uses a clearly labelled approximate surface interpolated from the mapped route heights. It does not present that fallback as a measured mountain surface. The renderer caches elevation in memory for the session. No account, API key, location permission or login is needed.
 
@@ -76,12 +76,16 @@ Country outlines: Natural Earth, public domain. Three.js: MIT, license in `vendo
 
 ## Development
 
-The game is a buildless static application. Three.js and Leaflet are vendored, and there is no dependency-install step.
+The game is a buildless static application. `vendor/manifest.json` pins the Three.js and Leaflet distribution URLs and checksums. The launcher fetches these libraries on first use; generated library bundles are not stored in Git.
 
 - `npm test` validates the included data, terrain grids and simulation (Node.js 22+).
 - `npm start` launches the game through Python 3 and opens a browser.
-- `npm run serve` serves the project at http://127.0.0.1:8000 without opening a browser.
+- `npm run serve` prepares its browser libraries and serves the project at http://127.0.0.1:8000 without opening a browser.
 
 The GitHub Actions workflow runs data/simulation tests and checks the Python launcher on every push and pull request.
 
 Main modules: `app.js` coordinates the interface and game state; `core.mjs` contains the simulation and geographic helpers; `world.js` builds and renders the 3D scene; `terrain.js` loads elevation; `map.js` handles resort selection.
+
+Cached terrain grids are stored in small row-group files referenced by each `*.dem.json`; the loader joins their unchanged float32 bytes. Tests verify SHA-256 checksums of the assembled heights.
+
+Larger resort snapshots and the catalogue use referenced vector/catalogue parts. The map background uses separate country outline files for the Nordic countries and nearby context.
