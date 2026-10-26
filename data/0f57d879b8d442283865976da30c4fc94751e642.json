@@ -1,0 +1,1 @@
+{"id":"0f57d879b8d442283865976da30c4fc94751e642","name":"Hurdal","country":"NO","center":[11.06293415,60.46496675],"statistics":{"runs":{"byActivity":{}},"lifts":{"byType":{}}},"sources":[{"id":"relation/16388055","type":"openstreetmap"},{"id":14342,"type":"skimap.org"}],"runs":[],"lifts":[],"bounds":[11.05293415,60.454966750000004,11.07293415,60.47496675]}
