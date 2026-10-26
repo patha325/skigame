@@ -1,0 +1,1 @@
+{"id":"85fd3e6481ed415c95c45a14a7f51b9c6e9cfcb9","name":"Vuokatti","country":"FI","center":[28.27401295,64.1322742],"statistics":{"runs":{"byActivity":{}},"lifts":{"byType":{}}},"sources":[{"id":"way/324859791","type":"openstreetmap"},{"id":1834,"type":"skimap.org"}],"runs":[],"lifts":[],"bounds":[28.264012949999998,64.12227419999999,28.28401295,64.1422742]}

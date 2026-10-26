@@ -1,0 +1,1 @@
+{"id":"d4c44f321f5759f5154dc07b8c41ffaa8cc0b9d1","name":"Pukkivuori","country":"FI","center":[23.763665,62.235824],"statistics":{"runs":{"byActivity":{}},"lifts":{"byType":{}}},"sources":[{"id":"relation/15508068","type":"openstreetmap"},{"id":15518,"type":"skimap.org"}],"runs":[],"lifts":[],"bounds":[23.753664999999998,62.225824,23.773665,62.245824]}

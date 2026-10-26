@@ -1,0 +1,1 @@
+{"id":"bd41d01c78778096fb803d626f0dfdcd218d473c","name":"Kjemsasen","country":"NO","center":[13.35253365,65.8422866],"statistics":{"runs":{"byActivity":{}},"lifts":{"byType":{}}},"sources":[{"id":"relation/14784297","type":"openstreetmap"},{"id":14345,"type":"skimap.org"}],"runs":[],"lifts":[],"bounds":[13.34253365,65.83228659999999,13.36253365,65.8522866]}
