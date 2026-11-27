@@ -1,0 +1,51 @@
+{
+  "renderedUTC": "2026-11-27T11:25:02.497Z",
+  "sourceSHA": "ab1940dab93192674f00ff6711c29ccadba12bdf",
+  "baselineSHA": "a66e4ec4031bd589c0d00ef8c80baacb509c2824",
+  "viewport": {
+    "width": 2048,
+    "height": 780
+  },
+  "records": [
+    {
+      "capture": "before",
+      "metrics": null
+    },
+    {
+      "capture": "sunset",
+      "metrics": {
+        "style": "sunset-helmet-0.3",
+        "mood": "alpenglow",
+        "cameraDistance": 4.5,
+        "riderScreenHeight": 0.7130476517521452,
+        "trees": {
+          "near": 1376,
+          "middle": 7200,
+          "far": 30000
+        },
+        "hdr": true,
+        "triangles": 3176216,
+        "drawCalls": 280
+      }
+    },
+    {
+      "capture": "daylight",
+      "metrics": {
+        "style": "sunset-helmet-0.3",
+        "mood": "day",
+        "cameraDistance": 4.5,
+        "riderScreenHeight": 0.714819819672967,
+        "trees": {
+          "near": 1376,
+          "middle": 7200,
+          "far": 30000
+        },
+        "hdr": true,
+        "triangles": 3176216,
+        "drawCalls": 280
+      }
+    }
+  ],
+  "errors": [],
+  "externalRequests": []
+}
