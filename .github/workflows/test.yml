@@ -33,7 +33,7 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: python3 bootstrap.py
-      - run: npm run build
+      - run: npm run build -- --output=nordic-line-0.2.0.zip
       - run: npm run build:site
       - name: Test combined site and offline file in real Chromium
         run: npm run test:browser
@@ -47,7 +47,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: nordic-line-0.2.0
-          path: ../nordic-line-0.2.0.zip
+          path: nordic-line-0.2.0.zip
       - uses: actions/upload-artifact@v4
         with:
           name: static-site
