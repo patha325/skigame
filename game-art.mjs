@@ -10,7 +10,7 @@ export function roundedBox(width,height,depth,radius=.05){
 export function snowPine(level=0){
   const pos=[],col=[],green=new THREE.Color(0x38574e),deep=new THREE.Color(0x253f3c),white=new THREE.Color(0xe3eaf2);
   const tiers=level===0?6:level===1?4:2,sides=level===0?8:level===1?6:4,rows=level===0?3:2;
-  const tri=(a,b,c,color)=>{pos.push(...a,...b,...c);for(let i=0;i<3;i++)col.push(color.r,color.g,color.b);};
+  const tri=(a,b,c,color)=>{pos.push(...a,...c,...b);for(let i=0;i<3;i++)col.push(color.r,color.g,color.b);};
   function crown(y,r,h,index,snow){
     const rings=[];
     for(let row=0;row<rows;row++){const ring=[];for(let j=0;j<sides;j++){

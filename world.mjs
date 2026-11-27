@@ -35,17 +35,17 @@ export class MountainView{
     this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;
     this.scene=new THREE.Scene();this.scene.fog=new THREE.Fog(0xd4bdcd,1000,6500);
     this.camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.12,42000);
-    this.hemi=new THREE.HemisphereLight(0xc0cbed,0x8e7495,2.05);this.scene.add(this.hemi);
-    this.sun=new THREE.DirectionalLight(0xffc18a,4.8);this.sun.castShadow=true;this.sun.shadow.mapSize.set(2048,2048);
+    this.hemi=new THREE.HemisphereLight(0xc0cbed,0x8e7495,1.15);this.scene.add(this.hemi);
+    this.sun=new THREE.DirectionalLight(0xffc18a,7.5);this.sun.castShadow=true;this.sun.shadow.mapSize.set(2048,2048);
     Object.assign(this.sun.shadow.camera,{left:-72,right:72,top:72,bottom:-72,near:5,far:800});
     this.sun.shadow.bias=-.00014;this.sun.shadow.normalBias=.035;this.sun.shadow.radius=3;
     this.sun.shadow.camera.updateProjectionMatrix();this.scene.add(this.sun,this.sun.target);
-    this.fill=new THREE.DirectionalLight(0xe5dcea,1.0);this.scene.add(this.fill,this.fill.target);
+    this.fill=new THREE.DirectionalLight(0xe5dcea,.48);this.scene.add(this.fill,this.fill.target);
     this.root=new THREE.Group();this.scene.add(this.root);
     this.target=new THREE.Vector3();this.desired=new THREE.Vector3();this.normal=new THREE.Vector3();this.forward=new THREE.Vector3();this.right=new THREE.Vector3();this.matrix=new THREE.Matrix4();
     this.highQuality=true;this.sunDirection=new THREE.Vector3(.5,.14,-.85).normalize();this.mood='alpenglow';
     this.cameraReady=false;this.time=0;this.frame=0;this.wide=false;this.cameraDistance=4.5;this.cameraHeight=3.1;this.trailN=0;this.trailClock=0;
-    this.makeSky();this.makeEnvironment();this.makeRider();this.pipeline=new ArtPipeline(this.renderer);
+    this.makeSky();this.makeEnvironment();this.makeRider();this.makeContactShadow();this.pipeline=new ArtPipeline(this.renderer);
     canvas.__mountainView=this;
   }
 
@@ -59,8 +59,8 @@ export class MountainView{
         void main(){
           vec3 r=normalize(skyWorld-cameraPosition);float y=max(r.y,0.);
           float facing=pow(max(dot(normalize(r.xz),normalize(uSun.xz)),0.),9.);
-          float low=exp(-y*5.);vec3 zenith=mix(vec3(.10,.25,.57),vec3(.55,.24,.34),uWarm);
-          vec3 horizon=mix(vec3(.8,1.05,1.5),mix(vec3(.92,.56,.55),vec3(2.1,1.12,.45),facing),uWarm);
+          float low=exp(-y*5.);vec3 zenith=mix(vec3(.10,.25,.57),vec3(.58,.23,.29),uWarm);
+          vec3 horizon=mix(vec3(.8,1.05,1.5),mix(vec3(.92,.56,.55),vec3(2.2,.73,.16),facing),uWarm);
           vec3 color=mix(zenith,horizon,low);
           vec2 p=r.xz/max(.07,y+.07)*vec2(.25,2.4);
           float clouds=ns(p*.8)*.56+ns(p*2.2)*.27+ns(p*5.4)*.12;
@@ -77,7 +77,7 @@ export class MountainView{
     const c=document.createElement('canvas');c.width=256;c.height=128;const ctx=c.getContext('2d'),g=ctx.createLinearGradient(0,0,0,128);
     g.addColorStop(0,'#9c9abb');g.addColorStop(.40,'#f1c9b5');g.addColorStop(.51,'#fff0d2');g.addColorStop(.56,'#b3bace');g.addColorStop(1,'#e1e6ef');ctx.fillStyle=g;ctx.fillRect(0,0,256,128);
     const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.mapping=THREE.EquirectangularReflectionMapping;
-    const generator=new THREE.PMREMGenerator(this.renderer);this.environment=generator.fromEquirectangular(tex);this.scene.environment=this.environment.texture;tex.dispose();generator.dispose();
+    const generator=new THREE.PMREMGenerator(this.renderer);this.environment=generator.fromEquirectangular(tex);this.scene.environment=this.environment.texture;this.scene.environmentIntensity=.45;tex.dispose();generator.dispose();
   }
 
   clearWorld(){
@@ -197,7 +197,7 @@ export class MountainView{
       for(let d=40;d<length;d+=140){const p=curve.getPointAt(d/length),v=curve.getTangentAt(d/length);chairs.push({p,v});}
       this.liftPaths.push({name:lift.name,points:raw,curve,length});
     }
-    const pole=merged([[new THREE.CylinderGeometry(.15,.22,10.8,6).translate(0,5.4,0),0x67767c],[new THREE.BoxGeometry(3.5,.24,.25).translate(0,10.6,0),0x3b454e]]);
+    const pole=merged([[new THREE.CylinderGeometry(.15,.22,10.8,6).translate(0,5.4,0),0x67767c],[new THREE.BoxGeometry(4.6,.24,.25).translate(0,10.6,0),0x3b454e],[new THREE.CylinderGeometry(.55,.55,1.7,10).translate(0,.85,0),0xd5672b],[new THREE.CylinderGeometry(.558,.558,.22,10).translate(0,.87,0),0xf3e8ce]]);
     const mesh=new THREE.InstancedMesh(pole,new THREE.MeshLambertMaterial({vertexColors:true}),towers.length);
     towers.forEach(({p,v},i)=>{this.matrix.compose(new THREE.Vector3(p.x,this.terrain.height(p.x,p.z),p.z),new THREE.Quaternion().setFromAxisAngle(UP,Math.atan2(v.x,v.z)),new THREE.Vector3(1,1,1));mesh.setMatrixAt(i,this.matrix);});mesh.castShadow=true;this.root.add(mesh);
     const chair=merged([[new THREE.CylinderGeometry(.035,.035,2.1,4).translate(0,-1.05,0),0x3d4550],[new THREE.BoxGeometry(1.55,.12,.5).translate(0,-2.2,0),0x263e4b],[new THREE.BoxGeometry(1.55,.6,.08).translate(0,-1.9,-.24),0x2d424c]]);
@@ -205,22 +205,39 @@ export class MountainView{
     chairs.forEach(({p,v},i)=>{this.matrix.compose(p,new THREE.Quaternion().setFromAxisAngle(UP,Math.atan2(v.x,v.z)),new THREE.Vector3(1,1,1));seats.setMatrixAt(i,this.matrix);});seats.castShadow=true;this.root.add(seats);
   }
   setRun(run){
-    if(this.markerGroup){this.root.remove(this.markerGroup);this.markerGroup.traverse(o=>{o.geometry?.dispose();o.material?.dispose();});}
-    this.markerGroup=new THREE.Group();this.root.add(this.markerGroup);let total=0;
-    const white=new THREE.MeshLambertMaterial({color:0xf2f1eb}),red=new THREE.MeshLambertMaterial({color:0xcf4d6d}),blue=new THREE.MeshLambertMaterial({color:0x3783b7});
+    if(this.markerGroup){this.root.remove(this.markerGroup);const materials=new Set();this.markerGroup.traverse(o=>{o.geometry?.dispose();if(o.material)materials.add(o.material);});materials.forEach(m=>{m.map?.dispose();m.dispose();});}
+    this.markerGroup=new THREE.Group();this.root.add(this.markerGroup);
+    const points=[[],[]],white=0xf4ede4;
     for(let i=0;i<run.points.length-1;i++){
       const a=run.points[i],b=run.points[i+1],dx=b[0]-a[0],dz=b[2]-a[2],len=Math.hypot(dx,dz);if(len<1)continue;
-      const spacing=90,n=Math.ceil(len/spacing);
+      const n=Math.max(1,Math.ceil(len/80));
       for(let j=0;j<n;j++){const f=j/n,x=a[0]+dx*f,z=a[2]+dz*f;
-        for(const s of [-1,1]){const px=x-dz/len*17*s,pz=z+dx/len*17*s,h=this.terrain.height(px,pz),g=new THREE.Group();g.position.set(px,h,pz);
-          const p=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,1.55,5),white);p.position.y=.78;g.add(p);
-          const cap=new THREE.Mesh(new THREE.CylinderGeometry(.042,.042,.37,5),s===1?red:blue);cap.position.y=1.35;g.add(cap);this.markerGroup.add(g);}
-      }total+=len;
+        for(const s of [-1,1])points[s===-1?0:1].push([x-dz/len*17*s,z+dx/len*17*s]);
+      }
     }
-    const a=run.points[0],b=run.points[1],h=Math.atan2(b[0]-a[0],b[2]-a[2]);this.groomDirection=new THREE.Vector2(Math.cos(h),-Math.sin(h));this.snowShader?.uniforms.uGroom.value.copy(this.groomDirection);
-    this.runHeading=h;this.setWorldMood(this.mood);
-    this.cameraReady=false;this.trailN=0;this.trailClock=0;for(const trail of this.trails??[])trail.geometry.setDrawRange(0,0);
+    for(let side=0;side<2;side++){
+      const g=merged([[new THREE.CylinderGeometry(.033,.033,1.55,5).translate(0,.78,0),white],[new THREE.CylinderGeometry(.042,.042,.37,5).translate(0,1.35,0),side===0?0x387ca4:0xc95555]]);
+      const m=new THREE.InstancedMesh(g,new THREE.MeshLambertMaterial({vertexColors:true}),points[side].length);
+      points[side].forEach(([x,z],i)=>{this.matrix.makeTranslation(x,this.terrain.height(x,z),z);m.setMatrixAt(i,this.matrix);});this.markerGroup.add(m);
+    }
+    const canvas=document.createElement('canvas');canvas.width=canvas.height=64;const ctx=canvas.getContext('2d');ctx.strokeStyle='#df7932';ctx.lineWidth=2;ctx.beginPath();
+    for(let k=0;k<=64;k+=8){ctx.moveTo(k,0);ctx.lineTo(k,64);ctx.moveTo(0,k);ctx.lineTo(64,k);}ctx.stroke();
+    const texture=new THREE.CanvasTexture(canvas);texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.repeat.set(8,1);
+    const net=new THREE.MeshStandardMaterial({map:texture,transparent:true,alphaTest:.2,side:THREE.DoubleSide,roughness:.8,depthWrite:false});
+    const post=new THREE.MeshStandardMaterial({color:0xc45f27,roughness:.7});let distance=0,placed=0;
+    for(let i=1;i<run.points.length&&placed<3;i++){
+      const a=run.points[i-1],b=run.points[i],dx=b[0]-a[0],dz=b[2]-a[2],len=Math.hypot(dx,dz);distance+=len;
+      if(len<5||distance<25+placed*230)continue;
+      const tx=dx/len,tz=dz/len,x=a[0]+tx*6+tz*24,z=a[2]+tz*6-tx*24;
+      const start=this.terrain.height(x,z),end=this.terrain.height(x+tx*12,z+tz*12),middle=(start+end)/2;
+      const fence=new THREE.Mesh(new THREE.PlaneGeometry(12,1.15),net);fence.position.set(x+tx*6,middle+.8,z+tz*6);fence.rotation.y=Math.atan2(-tz,tx);fence.rotation.z=Math.atan2(end-start,12);this.markerGroup.add(fence);
+      for(const f of [0,.5,1]){const px=x+tx*12*f,pz=z+tz*12*f,pole=new THREE.Mesh(new THREE.CylinderGeometry(.052,.052,1.65,6),post);pole.position.set(px,this.terrain.height(px,pz)+.825,pz);pole.castShadow=true;this.markerGroup.add(pole);}
+      placed++;
+    }
+    const p=run.points[0],q=run.points[1],h=Math.atan2(q[0]-p[0],q[2]-p[2]);this.groomDirection=new THREE.Vector2(Math.cos(h),-Math.sin(h));this.snowShader?.uniforms.uGroom.value.copy(this.groomDirection);
+    this.runHeading=h;this.setWorldMood(this.mood);this.cameraReady=false;this.trailN=0;this.trailClock=0;for(const trail of this.trails??[])trail.geometry.setDrawRange(0,0);
   }
+
   makeTrails(){
     this.trails=[];for(let i=0;i<2;i++){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6000*3),3).setUsage(THREE.DynamicDrawUsage));g.setDrawRange(0,0);const line=new THREE.Line(g,new THREE.LineBasicMaterial({color:0x7893aa,transparent:true,opacity:.29}));line.frustumCulled=false;this.root.add(line);this.trails.push(line);}
   }
@@ -230,13 +247,20 @@ export class MountainView{
     this.rider.scale.setScalar(1.08);this.scene.add(this.rider);this.setGear('ski');
   }
 
+  makeContactShadow(){
+    const c=document.createElement('canvas');c.width=c.height=128;const ctx=c.getContext('2d'),g=ctx.createRadialGradient(64,64,3,64,64,62);
+    g.addColorStop(0,'rgba(44,36,64,.8)');g.addColorStop(.4,'rgba(44,36,64,.45)');g.addColorStop(1,'rgba(44,36,64,0)');ctx.fillStyle=g;ctx.fillRect(0,0,128,128);
+    const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;
+    this.contactShadow=new THREE.Mesh(new THREE.PlaneGeometry(2.1,2.7).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:texture,transparent:true,opacity:.35,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2}));
+    this.contactShadow.renderOrder=1;this.scene.add(this.contactShadow);
+  }
   setGear(mode){
     this.mode=mode;buildEquipment(this.gear,mode);this.human.rotation.y=mode==='snowboard'?Math.PI/2:0;
   }
 
   setWorldMood(mood){
     this.mood=mood;const day=mood==='day';this.skyMaterial.uniforms.uWarm.value=day?0:1;
-    this.sun.color.setHex(day?0xfff0d8:0xffba7b);this.sun.intensity=day?3.8:4.8;
+    this.sun.color.setHex(day?0xfff0d8:0xffba7b);this.sun.intensity=day?4.6:7.5;
     this.hemi.color.setHex(day?0xbcd7f7:0xc0cbed);this.hemi.groundColor.setHex(day?0x96a3ba:0x8e7495);
     this.scene.fog.color.setHex(day?0xc3d3e7:0xd4bdcd);
     if(this.runHeading!==undefined){const a=this.runHeading+.35,e=day ? .65:.13;this.sunDirection.set(Math.sin(a)*Math.cos(e),Math.sin(e),Math.cos(a)*Math.cos(e));}
@@ -279,6 +303,9 @@ export class MountainView{
       this.fill.position.copy(this.camera.position).add(new THREE.Vector3(0,6,0));this.fill.target.position.set(actor.x,actor.y+1,actor.z);this.fill.target.updateMatrixWorld();
     }
     if(options.recordTrail)this.addTrail(actor,dt);
+    this.contactShadow.position.set(actor.x,this.terrain.height(actor.x,actor.z)+.045,actor.z);
+    this.normal.set(-gx,1,-gz).normalize();this.contactShadow.quaternion.setFromUnitVectors(UP,this.normal);
+    const hover=Math.max(0,actor.y-this.terrain.height(actor.x,actor.z));this.contactShadow.material.opacity=Math.max(0,.38-hover*.06);this.contactShadow.scale.setScalar(1+Math.min(2,hover*.18));
     this.pipeline.render(this.scene,this.camera,this.sunDirection,this.mood==='day'?0:1);
   }
   photoMetrics(){

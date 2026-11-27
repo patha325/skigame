@@ -5,7 +5,7 @@
   "description": "An original 3D ski and snowboard game with open Nordic resort geography.",
   "type": "module",
   "scripts": {
-    "test": "node --test tests/core.test.mjs tests/physics.test.mjs tests/resorts-and-controls.test.mjs tests/integration.test.mjs",
+    "test": "node --test tests/core.test.mjs tests/physics.test.mjs tests/resorts-and-controls.test.mjs tests/integration.test.mjs tests/art-geometry.test.mjs",
     "build": "node tools/build_release.mjs",
     "build:html": "node tools/build_release.mjs --html-only",
     "build:site": "node tools/build_site.mjs",
