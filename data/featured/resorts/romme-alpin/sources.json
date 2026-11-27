@@ -1,0 +1,67 @@
+{
+  "retrievedUTC": "2026-11-26",
+  "sources": [
+    {
+      "url": "https://tiles.mapterhorn.com/13/4445/2360.webp",
+      "file": "13-4445-2360.webp",
+      "bytes": 85638,
+      "sha256": "082fe2d990f2abd08799ba34b884dc12797cedb4d2551ca4586298523521d6fb"
+    },
+    {
+      "url": "https://tiles.mapterhorn.com/13/4445/2361.webp",
+      "file": "13-4445-2361.webp",
+      "bytes": 96152,
+      "sha256": "711d76a3f8973114dc314c609513f97930dc5c52b01ed35ff2039ab09345fd5c"
+    },
+    {
+      "url": "https://tiles.mapterhorn.com/13/4445/2362.webp",
+      "file": "13-4445-2362.webp",
+      "bytes": 101636,
+      "sha256": "15468c805839f5c97d8843ca1aaab328e99d7f0e9b8737f68c1d5d30b1679cf2"
+    },
+    {
+      "url": "https://tiles.mapterhorn.com/13/4446/2360.webp",
+      "file": "13-4446-2360.webp",
+      "bytes": 82628,
+      "sha256": "4c2b604b40e041edcbea23dbff28cafd2db17057e49d57c3e10768df4c1a3908"
+    },
+    {
+      "url": "https://tiles.mapterhorn.com/13/4446/2361.webp",
+      "file": "13-4446-2361.webp",
+      "bytes": 97542,
+      "sha256": "1c2dbcd0b1e0f1034d6da225297b374b44b44a7758f5129ca60daeccac9614b3"
+    },
+    {
+      "url": "https://tiles.mapterhorn.com/13/4446/2362.webp",
+      "file": "13-4446-2362.webp",
+      "bytes": 95240,
+      "sha256": "c25a50384e47106f02f7624c8f5fd8c58bf2908958c38b226a60eb422855140f"
+    },
+    {
+      "url": "https://tiles.mapterhorn.com/13/4447/2360.webp",
+      "file": "13-4447-2360.webp",
+      "bytes": 90862,
+      "sha256": "4ccec1e61c7c93e0fe7a1f92cdd49dbabe31d184415400fc0d743067b005c3df"
+    },
+    {
+      "url": "https://tiles.mapterhorn.com/13/4447/2361.webp",
+      "file": "13-4447-2361.webp",
+      "bytes": 100016,
+      "sha256": "43c612ad9aa2da7aef654c7bcfe71602f19c924414ee0ba00580537beed08045"
+    },
+    {
+      "url": "https://tiles.mapterhorn.com/13/4447/2362.webp",
+      "file": "13-4447-2362.webp",
+      "bytes": 83262,
+      "sha256": "73e8e3b3ffd53b369e4035f7b5c22f94d25029c303cec3d846f5623a1362755a"
+    },
+    {
+      "url": "https://data.bonvo.ski/data/v2/releases/2026-09-22-f6378027/resorts/f54edf4eb846b74ae58ad68a608eef4ae1599627_runs.geojson",
+      "sha256": "c8dbd754b6554ad6af42288a665a6bb6323aaf2d8ad4d2462d0214aa09a332b0"
+    },
+    {
+      "url": "https://data.bonvo.ski/data/v2/releases/2026-09-22-f6378027/resorts/f54edf4eb846b74ae58ad68a608eef4ae1599627_lifts.geojson",
+      "sha256": "e2e2c2aede0d2a86c2f6aaf022f06651c71f3eabbf8b41501989b3f5bb4d39e1"
+    }
+  ]
+}

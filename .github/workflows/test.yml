@@ -1,23 +1,72 @@
 name: Test
-
 on:
   push:
+    branches: [main]
   pull_request:
-
 permissions:
   contents: read
-
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  unit:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate resort data and game simulation
-        run: npm test
-      - name: Validate dependency bootstrap
-        run: python3 -m unittest discover -s tests -p "*_test.py"
-      - name: Check launcher syntax
-        run: python3 -m py_compile launch.py bootstrap.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm test
+      - run: python -m unittest discover -s tests -p "*_test.py"
+      - run: python -m py_compile launch.py bootstrap.py
+  browser-and-build:
+    permissions:
+      contents: write
+    concurrency:
+      group: nordic-visual-review
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: python3 bootstrap.py
+      - run: npm run build -- --output=nordic-line-0.3.0.zip
+      - run: npm run build:site
+      - name: Prepare previous renderer for the visual comparison
+        run: git fetch --no-tags --depth=1 origin a66e4ec4031bd589c0d00ef8c80baacb509c2824
+      - name: Render the new art direction and its baseline
+        run: node tests/art-capture.mjs
+        env:
+          LOCAL_RIDE_BROWSER: /usr/bin/google-chrome
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Publish visual review images
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: node tools/publish_art_review.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
+      - name: Test combined site and offline file in real Chromium
+        run: npm run test:browser
+        env:
+          LOCAL_RIDE_BROWSER: /usr/bin/google-chrome
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-evidence
+          path: tests/_artifacts/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nordic-line-0.3.0
+          path: nordic-line-0.3.0.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: static-site
+          path: dist/

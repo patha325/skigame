@@ -1,0 +1,71 @@
+{
+  "retrievedUTC": "2026-11-27",
+  "sources": [
+    {
+      "url": "https://data.bonvo.ski/data/v2/releases/2026-09-22-f6378027/resorts/24ab41e1438aff639aa8ef5ad91c3e187e2f8585_lifts.geojson",
+      "file": "trysil-lifts.geojson",
+      "bytes": 45388,
+      "sha256": "dfb49c68b8823cdf8ee16b300e5afeff810196bf35d0b66c3480e5f3d37201e9"
+    },
+    {
+      "url": "https://data.bonvo.ski/data/v2/releases/2026-09-22-f6378027/resorts/24ab41e1438aff639aa8ef5ad91c3e187e2f8585_runs.geojson",
+      "file": "trysil-runs.geojson",
+      "bytes": 1061212,
+      "sha256": "511c68d039919d3eed63f62749218eefd5760a4f8b58819a7fc45e689c7d0829"
+    },
+    {
+      "x": 2186,
+      "y": 1158,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2186/1158.webp",
+      "file": "trysil/12-2186-1158.webp",
+      "bytes": 89170,
+      "sha256": "d4b8ff9ac2f8498043cb3646246b17a3e52a29100d6edcac2f627e7789484519"
+    },
+    {
+      "x": 2187,
+      "y": 1158,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2187/1158.webp",
+      "file": "trysil/12-2187-1158.webp",
+      "bytes": 89186,
+      "sha256": "b1fd8cd5f4f3d58afc2fafb4476cff3cde397c62f423f7282c59ddfe00ffe1a3"
+    },
+    {
+      "x": 2185,
+      "y": 1158,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2185/1158.webp",
+      "file": "trysil/12-2185-1158.webp",
+      "bytes": 87012,
+      "sha256": "b5b0536fc2513eda7c1f02183a225a8544aac57cb7a21b2e11a7d977707d84a5"
+    },
+    {
+      "x": 2185,
+      "y": 1159,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2185/1159.webp",
+      "file": "trysil/12-2185-1159.webp",
+      "bytes": 77178,
+      "sha256": "175d994275a1ea68aae3d3cc7c8b2ed80d1c3a0752fdd2471b04337c7c0b63ed"
+    },
+    {
+      "x": 2187,
+      "y": 1159,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2187/1159.webp",
+      "file": "trysil/12-2187-1159.webp",
+      "bytes": 82732,
+      "sha256": "b6fe8260b7772fbff727ca846ed2f020371731e7c8de79eb3f0c1a154ae80572"
+    },
+    {
+      "x": 2186,
+      "y": 1159,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2186/1159.webp",
+      "file": "trysil/12-2186-1159.webp",
+      "bytes": 79754,
+      "sha256": "867af7567b2e44ce6afd66560a9b8ca62d178d3dc84492759dd095b131cce2b8"
+    }
+  ]
+}

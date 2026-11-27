@@ -1,13 +1,21 @@
 {
   "name": "nordic-line",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "private": true,
   "description": "An original 3D ski and snowboard game with open Nordic resort geography.",
   "type": "module",
   "scripts": {
-    "test": "node tests/core.test.mjs",
+    "test": "node --test tests/core.test.mjs tests/physics.test.mjs tests/resorts-and-controls.test.mjs tests/integration.test.mjs tests/art-geometry.test.mjs",
+    "build": "node tools/build_release.mjs",
+    "build:html": "node tools/build_release.mjs --html-only",
+    "build:site": "node tools/build_site.mjs",
+    "test:browser": "node tests/browser-smoke.mjs",
     "start": "python3 launch.py",
-    "serve": "python3 launch.py --no-browser --port 8000"
+    "serve": "python3 launch.py --no-browser --port 8000",
+    "serve:node": "node serve.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "1.65.1"
   },
   "engines": {
     "node": ">=22"

@@ -1,0 +1,66 @@
+// Real Chromium + WebGL smoke checks for the merged site and standalone file.
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import http from 'node:http';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {createRequire} from 'node:module';
+import assert from 'node:assert/strict';
+const require=createRequire(import.meta.url),{chromium}=require(process.env.PLAYWRIGHT_MODULE??'playwright-core');
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),artifacts=path.join(root,'tests/_artifacts');
+await fs.mkdir(artifacts,{recursive:true});
+const executable=process.env.LOCAL_RIDE_BROWSER??(process.platform==='win32'?'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe':process.platform==='darwin'?'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome':'/usr/bin/google-chrome');
+const server=http.createServer(async(req,res)=>{try{const url=new URL(req.url,'http://localhost'),f=path.resolve(root,'.'+(url.pathname==='/'?'/index.html':decodeURIComponent(url.pathname)));if(!f.startsWith(root+path.sep))throw Error();const bytes=await fs.readFile(f),ext=path.extname(f);res.writeHead(200,{'Content-Type':({'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.json':'application/json','.geojson':'application/json','.css':'text/css'})[ext]||'application/octet-stream'});res.end(bytes);}catch{res.writeHead(404);res.end();}});
+await new Promise(r=>server.listen(0,'127.0.0.1',r));
+const base='http://127.0.0.1:'+server.address().port;
+const browser=await chromium.launch({headless:true,executablePath:executable,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const context=await browser.newContext({viewport:{width:1365,height:850},deviceScaleFactor:1}),page=await context.newPage(),errors=[],network=[];
+page.setDefaultTimeout(60000);
+page.on('pageerror',e=>errors.push(e.message.slice(0,1000)));page.on('console',m=>{if(m.type()==='error')errors.push(m.text().slice(0,1000));});
+await context.route('**/*',route=>{const u=route.request().url();if(u.startsWith(base)||u.startsWith('file:')||u.startsWith('data:'))return route.continue();network.push(u);return route.abort();});
+const state=async value=>page.waitForFunction(value=>document.body.dataset.state===value,value,{timeout:90000});
+const ride=async()=>{await page.locator('#start').click();await state('riding');await page.waitForFunction(()=>Number(document.body.dataset.time)>1,null,{timeout:90000});};
+const results=[];
+try{
+  console.log('Checking merged static application');
+  await page.goto(base,{waitUntil:'load'});await state('setup');assert.equal(await page.locator('#resort option').count(),4);
+  await ride();await page.waitForFunction(()=>Number(document.body.dataset.time)>2,null,{timeout:90000});
+  const charge=Number(await page.locator('body').getAttribute('data-boost'));await page.keyboard.press('KeyE');
+  await page.waitForFunction(charge=>Number(document.body.dataset.boost)<charge,charge);
+  await page.keyboard.press('Escape');await state('paused');await page.waitForTimeout(300);
+  const paused=await page.locator('body').getAttribute('data-time');await page.waitForTimeout(300);assert.equal(await page.locator('body').getAttribute('data-time'),paused);
+  await page.locator('#resume').click();await page.keyboard.press('KeyC');await page.waitForFunction(()=>document.body.dataset.camera==='first');
+  await page.keyboard.press('KeyC');await page.keyboard.press('KeyC');
+  await page.keyboard.press('KeyM');await page.waitForFunction(()=>document.querySelector('#map-dialog').open);
+  await page.keyboard.press('KeyM');await page.waitForFunction(()=>!document.querySelector('#map-dialog').open);
+  await page.keyboard.press('KeyP');await state('replay');await page.keyboard.press('KeyP');await state('riding');
+  await page.keyboard.press('Backspace');await page.waitForFunction(()=>Number(document.body.dataset.time)<.6);
+  const pill=await page.locator('.run-pill').boundingBox(),mini=await page.locator('.minimap').boundingBox(),speed=await page.locator('.speed').boundingBox();
+  assert.ok(pill.x<25&&pill.y<25);assert.ok(mini.x>1100&&mini.y<25);assert.ok(speed.x<100&&speed.y>700);
+  await page.screenshot({path:path.join(artifacts,'romme-gameplay.png')});
+  for(const slug of ['are','trysil','thredbo-resort']){
+    console.log('Checking featured resort:',slug);await page.locator('#pick-run').click();await page.locator('#resort').selectOption(slug);
+    await page.waitForFunction(slug=>document.body.dataset.resort===slug&&document.body.dataset.state==='setup',slug,{timeout:90000});
+    const routes=await page.locator('#route option').count();assert.ok(routes>70);await ride();
+    await page.screenshot({path:path.join(artifacts,slug+'.png')});results.push({slug,routes});
+  }
+  console.log('Checking original Nordic map and imported Levi terrain');
+  await page.locator('#pick-run').click();await page.locator('#browse-nordic').click();
+  await page.waitForFunction(()=>document.getElementById('result-count').textContent.includes('569'));
+  await page.locator('#search').fill('Levi');await page.getByRole('button',{name:'Select Levi, Finland',exact:true}).click();
+  await page.waitForFunction(()=>document.getElementById('selection-note').textContent.startsWith('Location only'));
+  assert.equal(await page.locator('#nordic-ride').isDisabled(),true);
+  await page.getByRole('button',{name:'Select Levin hiihtokeskus, Levi Ski Resort, Finland',exact:true}).click();
+  await page.waitForFunction(()=>!document.getElementById('nordic-ride').disabled);
+  await page.screenshot({path:path.join(artifacts,'nordic-map.png')});
+  await page.locator('#nordic-ride').click();await state('setup');assert.match(await page.locator('#setup-title').textContent(),/Levi/);
+  assert.equal(await page.locator('body').getAttribute('data-terrain'),'measured');await page.locator('#ski').click();await ride();
+  assert.equal(await page.locator('body').getAttribute('data-gear'),'ski');await page.screenshot({path:path.join(artifacts,'levi-gameplay.png')});
+  results.push({slug:'Nordic catalogue: Levi',routes:await page.locator('#route option').count()});
+  console.log('Checking standalone file with all network requests blocked');
+  await context.clearCookies();await page.goto(pathToFileURL(path.join(root,'Nordic-Line-Offline.html')).href,{waitUntil:'load',timeout:90000});await state('setup');
+  assert.equal(await page.locator('#resort option').count(),4);assert.equal(await page.locator('#browse-nordic').isVisible(),false);await ride();
+  assert.equal(network.length,0,'Unexpected external requests: '+network.join(', '));assert.equal(errors.length,0,errors.join('\n'));
+  const report={testedUTC:new Date().toISOString(),browser:'Chromium / software WebGL',resorts:results,standaloneFile:true,externalRequests:network,errors,checks:['static site and file:// startup','four featured mountains','Nordic search and map','Levi terrain adapter','skis and snowboard','movement and HUD','boost','pause/resume','camera switching','map','replay','retry','zero external requests for cached terrain']};
+  await fs.writeFile(path.join(artifacts,'browser-verification.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
+}catch(e){await page.screenshot({path:path.join(artifacts,'failure.png')}).catch(()=>{});await fs.writeFile(path.join(artifacts,'failure.json'),JSON.stringify({message:e.message.slice(0,5000),errors,network,state:await page.locator('body').getAttribute('data-state')},null,2));console.error(e.message.slice(0,1800));process.exitCode=1;
+}finally{await context.close();await browser.close();await new Promise(r=>server.close(r));}

@@ -9,3 +9,8 @@ work/
 /vendor/three.module.js
 /vendor/leaflet.js
 /vendor/leaflet.css
+
+/Nordic-Line-Offline.html
+/CHECKSUMS.json
+/dist/
+/tests/_artifacts/
