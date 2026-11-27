@@ -20,7 +20,7 @@ export function snowPine(level=0){
       ring.push([Math.cos(angle)*radius,y+(row===0?h:row===rows-1?0:h*.39)+(snow ? .05:0)-droop,Math.sin(angle)*radius]);
     }rings.push(ring);}
     const color=snow?white:(index%2?green:deep);
-    for(let row=0;row<rows-1;row++)for(let j=0;j<sides;j++){const k=(j+1)%sides;tri(rings[row][j],rings[row+1][j],rings[row+1][k],color);tri(rings[row][j],rings[row+1][k],rings[row][k],color);}
+    for(let row=0;row<rows-1;row++)for(let j=0;j<sides;j++){if(snow&&row===rows-2&&j%6!==0&&artHash(j,index,93)>.35)continue;const k=(j+1)%sides;tri(rings[row][j],rings[row+1][j],rings[row+1][k],color);tri(rings[row][j],rings[row+1][k],rings[row][k],color);}
   }
   // A small exposed trunk and overlapping uneven boughs give a tree silhouette.
   const trunk=new THREE.CylinderGeometry(.018,.032,.9,5).translate(0,.45,0).toNonIndexed();
