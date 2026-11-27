@@ -30,11 +30,17 @@ The source-specific elevation attribution metadata is included in `mapterhorn-at
 - Natural Earth 1:50m country polygons: https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_50m_admin_0_countries.geojson
 - Natural Earth public-domain terms: https://www.naturalearthdata.com/about/terms-of-use/
 - Country outlines are a geographic subset of the Natural Earth data with display names retained and other properties removed.
-- Three.js 0.170.0: https://www.npmjs.com/package/three/v/0.170.0 — MIT.
+- Three.js 0.172.0: https://www.npmjs.com/package/three/v/0.172.0 — MIT.
 - Leaflet 1.9.4: https://leafletjs.com/ — BSD-2-Clause.
 
-No proprietary ski-map imagery, Bonvo data, Bonvo music or Bonvo source code is included. Resort names identify places only. The game is independent of the resorts and data providers.
+No proprietary ski-map imagery, music, models or Bonvo application code is included. The featured-resort geographic extract uses Bonvo’s explicitly reusable ODbL data; see DATA-LICENSES.md. Resort names identify places only. The game is independent of the resorts and data providers.
 
 Library bundles are downloaded by `bootstrap.py` from the pinned registry distribution URLs in `vendor/manifest.json`. The manifest records SHA-256 checksums verified before the files are saved. Their license notices remain tracked in `vendor/`.
 
 Larger vector snapshots and the resort catalogue are partitioned into referenced JSON files without dropping their source features. Country outline files include the five Nordic countries and selected nearby context; the full-country Russia polygon is omitted from this regional display.
+
+## Combined version 0.2
+
+`data/featured/` adds independently sampled Mapterhorn terrain and ODbL piste/lift extracts for Romme Alpin, Åre, Trysil and Thredbo. Exact source URLs, transformations and hashes are retained in each resort’s `sources.json` and in `DATA-LICENSES.md`. These inputs are separate from the October Nordic snapshot above; feature identifiers and counts can differ between releases. The original 569-record catalogue is preserved without dropping its data.
+
+The runtime adapts a selected Nordic resort into a square local heightfield, bilinearly samples its elevation grid, orders routes downhill and rasterises piste distances. One free-moving physics engine and renderer then serve both datasets. A failed online DEM request still produces the explicitly labelled estimated surface.

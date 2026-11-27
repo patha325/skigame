@@ -1,0 +1,18 @@
+.browse-nordic{width:100%;margin-top:10px;font-size:10px}
+#nordic-dialog{width:1120px;padding:20px;max-width:calc(100vw - 24px)}
+#nordic-count{font-size:10px;color:#8290a3}
+.nordic-layout{display:grid;grid-template-columns:235px 1fr;gap:16px;height:47vh;min-height:260px}
+.nordic-sidebar{display:flex;flex-direction:column;min-height:0}.nordic-sidebar label{margin-top:0}
+.nordic-sidebar input{border:1px solid #dce2ec;border-radius:9px;background:white;padding:10px;min-width:0;color:#46556b;font-size:12px;margin-bottom:10px}
+#result-count{font-size:9px;color:#8896a7;margin:10px 0}#resort-list{overflow:auto;flex:1;scrollbar-width:thin}
+.resort{display:flex;align-items:center;gap:9px;text-align:left;width:100%;background:transparent;color:#48546d;border:0;border-radius:9px;padding:10px 7px}
+.resort:hover,.resort.active{background:#e5eaf2}.resort strong{display:block;font-size:11px}.resort small{font-size:9px;color:#8793a4;display:block;margin-top:3px}
+.resort .pin{color:#65a18e;font-size:19px}.resort .arrow{margin-left:auto;color:#7c6a99}
+.nordic-map-wrap{position:relative;border:1px solid #d8e1e9;border-radius:12px;overflow:hidden}#map{height:100%;background:#d8e5e8;z-index:0}
+.map-reset{position:absolute;right:10px;top:10px;z-index:1;box-shadow:0 1px 12px #44556633}.map-label{font-size:10px;color:#748b96;letter-spacing:.08em;white-space:nowrap;pointer-events:none}
+.nordic-selection{display:grid;grid-template-columns:1fr 1.2fr 150px;gap:8px 15px;align-items:end;border-top:1px solid #e2e6ed;margin-top:14px;padding-top:14px}
+.nordic-selection h3{margin:4px 0;color:#3a465e;font-size:20px}.nordic-selection small{font-size:9px;color:#8e99a8}.nordic-selection span{font-size:10px;color:#8794a6}
+.nordic-selection label{margin:0}.nordic-selection .primary{margin:0}.nordic-selection p{grid-column:1/-1;margin:0;color:#8593a3;font-size:9px}
+#terrain-badge{position:fixed;right:13px;bottom:33px;font-size:10px;color:#715935;background:#fff1dbe8;border-radius:10px;padding:6px 9px}
+button:disabled{opacity:.45;cursor:default}
+@media(max-width:650px){#nordic-dialog{padding:15px}.nordic-layout{grid-template-columns:150px 1fr;gap:10px;height:42vh;min-height:230px}.nordic-selection{grid-template-columns:1fr 1fr}.nordic-selection>div{grid-column:1/-1}.nordic-selection .primary{font-size:10px;padding:13px 8px}.nordic-selection h3{font-size:16px}.map-reset{font-size:8px;padding:7px}.resort{padding:8px 3px}.resort .pin,.resort .arrow{display:none}}

@@ -1,0 +1,53 @@
+{
+  "version": 2,
+  "resorts": [
+    {
+      "slug": "romme-alpin",
+      "name": "Romme Alpin",
+      "country": "SE",
+      "region": "Dalarna",
+      "description": "Wooded Swedish hills",
+      "path": "resorts/romme-alpin",
+      "defaultName": "Bumerangen",
+      "forestLine": 450,
+      "treeType": "spruce",
+      "routes": 52
+    },
+    {
+      "slug": "are",
+      "name": "Åre",
+      "country": "SE",
+      "region": "Jämtland",
+      "description": "Åreskutan, Björnen and Duved",
+      "path": "resorts/are",
+      "defaultName": "Lundsrappet",
+      "forestLine": 870,
+      "treeType": "spruce",
+      "routes": 200
+    },
+    {
+      "slug": "trysil",
+      "name": "Trysil",
+      "country": "NO",
+      "region": "Innlandet",
+      "description": "Forested Norwegian mountain",
+      "path": "resorts/trysil",
+      "defaultName": "77",
+      "forestLine": 980,
+      "treeType": "spruce",
+      "routes": 167
+    },
+    {
+      "slug": "thredbo-resort",
+      "name": "Thredbo Resort",
+      "country": "AU",
+      "region": "New South Wales",
+      "description": "Australian alpine terrain",
+      "path": "resorts/thredbo-resort",
+      "defaultName": "Supertrail",
+      "forestLine": 1740,
+      "treeType": "eucalypt",
+      "routes": 96
+    }
+  ]
+}

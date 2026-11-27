@@ -1,8 +1,13 @@
 [
   {
-    "path": "three.module.js",
-    "url": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-    "sha256": "ce1fa418de16a19495a9f72495580e3015d7745c296d3ce0485897f902ddedfb"
+    "path": "three.core.min.js",
+    "url": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.core.min.js",
+    "sha256": "85c74c0fe8f35a348282bc1b2c099aa1e29a0ebf453c9df1c5ba68ea7d6d43f5"
+  },
+  {
+    "path": "three.module.min.js",
+    "url": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.min.js",
+    "sha256": "7700815c10cddde77e717bc9186f3f9b0fa64034c76622efc5f895459d2c305e"
   },
   {
     "path": "leaflet.js",

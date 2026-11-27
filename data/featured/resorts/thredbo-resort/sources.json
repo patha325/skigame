@@ -1,0 +1,35 @@
+{
+  "retrievedUTC": "2026-11-27",
+  "sources": [
+    {
+      "url": "https://data.bonvo.ski/data/v2/releases/2026-09-22-f6378027/resorts/d02b7dc18ab40ddd76c8e4d9882f8451121e479f_runs.geojson",
+      "file": "thredbo-resort-runs.geojson",
+      "bytes": 221004,
+      "sha256": "9a6721cace00fcae5844b81612f7288ecb5b12013ab7e4918dd23eeef864ea7f"
+    },
+    {
+      "url": "https://data.bonvo.ski/data/v2/releases/2026-09-22-f6378027/resorts/d02b7dc18ab40ddd76c8e4d9882f8451121e479f_lifts.geojson",
+      "file": "thredbo-resort-lifts.geojson",
+      "bytes": 19570,
+      "sha256": "49d7baa703e7f5bb35044d6031df9a28cdc4396f3d58fc608aa8df7c7148a711"
+    },
+    {
+      "x": 3734,
+      "y": 2494,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/3734/2494.webp",
+      "file": "thredbo-resort/12-3734-2494.webp",
+      "bytes": 106782,
+      "sha256": "5e248cb61961faf3fda97028fe48010cc4b9a0a4a9559307d3eab0dd81394b65"
+    },
+    {
+      "x": 3735,
+      "y": 2494,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/3735/2494.webp",
+      "file": "thredbo-resort/12-3735-2494.webp",
+      "bytes": 99314,
+      "sha256": "c047efd852d5f576a3fb391d89ba1f9b65f1a1d717ecf807fbf6137f4563a125"
+    }
+  ]
+}

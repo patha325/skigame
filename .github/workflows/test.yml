@@ -1,23 +1,54 @@
 name: Test
-
 on:
   push:
+    branches: [main]
   pull_request:
-
 permissions:
   contents: read
-
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  unit:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate resort data and game simulation
-        run: npm test
-      - name: Validate dependency bootstrap
-        run: python3 -m unittest discover -s tests -p "*_test.py"
-      - name: Check launcher syntax
-        run: python3 -m py_compile launch.py bootstrap.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm test
+      - run: python -m unittest discover -s tests -p "*_test.py"
+      - run: python -m py_compile launch.py bootstrap.py
+  browser-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: python3 bootstrap.py
+      - run: npm run build
+      - run: npm run build:site
+      - name: Test combined site and offline file in real Chromium
+        run: npm run test:browser
+        env:
+          LOCAL_RIDE_BROWSER: /usr/bin/google-chrome
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-evidence
+          path: tests/_artifacts/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nordic-line-0.2.0
+          path: ../nordic-line-0.2.0.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: static-site
+          path: dist/

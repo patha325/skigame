@@ -1,0 +1,40 @@
+{
+  "testedUTC": "2026-11-27T10:25:01.931Z",
+  "browser": "Chromium / software WebGL",
+  "resorts": [
+    {
+      "slug": "are",
+      "routes": 200
+    },
+    {
+      "slug": "trysil",
+      "routes": 167
+    },
+    {
+      "slug": "thredbo-resort",
+      "routes": 96
+    },
+    {
+      "slug": "Nordic catalogue: Levi",
+      "routes": 142
+    }
+  ],
+  "standaloneFile": true,
+  "externalRequests": [],
+  "errors": [],
+  "checks": [
+    "static site and file:// startup",
+    "four featured mountains",
+    "Nordic search and map",
+    "Levi terrain adapter",
+    "skis and snowboard",
+    "movement and HUD",
+    "boost",
+    "pause/resume",
+    "camera switching",
+    "map",
+    "replay",
+    "retry",
+    "zero external requests for cached terrain"
+  ]
+}

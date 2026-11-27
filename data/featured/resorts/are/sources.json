@@ -1,0 +1,242 @@
+{
+  "retrievedUTC": "2026-11-27",
+  "sources": [
+    {
+      "url": "https://data.bonvo.ski/data/v2/releases/2026-09-22-f6378027/resorts/5ea6683e3bed42670ca7fc03e9820599aee891a6_lifts.geojson",
+      "file": "are-lifts.geojson",
+      "bytes": 54246,
+      "sha256": "41ad286f3c860b093cb820c482c7175b07de268b00d9293a712424ec5ae4a593"
+    },
+    {
+      "url": "https://data.bonvo.ski/data/v2/releases/2026-09-22-f6378027/resorts/5ea6683e3bed42670ca7fc03e9820599aee891a6_runs.geojson",
+      "file": "are-runs.geojson",
+      "bytes": 614855,
+      "sha256": "7f0b0e4d2e233aace625a5e2c52d0b21e641942c5408bb63f9d599d97b5ecb6c"
+    },
+    {
+      "x": 2195,
+      "y": 1105,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2195/1105.webp",
+      "file": "are/12-2195-1105.webp",
+      "bytes": 77608,
+      "sha256": "2fb35043c46deacf5ee70d3b731888a9b0a726a5112f3375f929518f5d482ae8"
+    },
+    {
+      "x": 2194,
+      "y": 1105,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2194/1105.webp",
+      "file": "are/12-2194-1105.webp",
+      "bytes": 94064,
+      "sha256": "dfb9a652fbfee69a9f74c70d747705146c9077a47520ff42114aaac80eeff083"
+    },
+    {
+      "x": 2196,
+      "y": 1105,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2196/1105.webp",
+      "file": "are/12-2196-1105.webp",
+      "bytes": 84612,
+      "sha256": "20f3740ea0352a7e7f87f4cc25ec5773663ac931f46447224183fd18cdc9e21c"
+    },
+    {
+      "x": 2197,
+      "y": 1105,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2197/1105.webp",
+      "file": "are/12-2197-1105.webp",
+      "bytes": 57046,
+      "sha256": "1eb36f12ff54d9e68e0888bc65e05aeb2ed300630b077627e0a35d3f2bdb5ff5"
+    },
+    {
+      "x": 2194,
+      "y": 1106,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2194/1106.webp",
+      "file": "are/12-2194-1106.webp",
+      "bytes": 90450,
+      "sha256": "37588008abf93870427528a81a270e042f0fb2103c52b1a53a0cb856ecc76eed"
+    },
+    {
+      "x": 2198,
+      "y": 1105,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2198/1105.webp",
+      "file": "are/12-2198-1105.webp",
+      "bytes": 79966,
+      "sha256": "329a37ea573112dbf14ae81369e530ff49d821700c319d9d42e4b95eb1b22a7d"
+    },
+    {
+      "x": 2196,
+      "y": 1106,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2196/1106.webp",
+      "file": "are/12-2196-1106.webp",
+      "bytes": 96920,
+      "sha256": "14b7914bbcd58a8df09ffe4f02e0e52c7044277f5edb60b3036a9e8222909b7c"
+    },
+    {
+      "x": 2195,
+      "y": 1106,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2195/1106.webp",
+      "file": "are/12-2195-1106.webp",
+      "bytes": 90574,
+      "sha256": "46474a27b22e04873f5448f139e05347863d90c92ec1562ae22b4ba06288c747"
+    },
+    {
+      "x": 2194,
+      "y": 1107,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2194/1107.webp",
+      "file": "are/12-2194-1107.webp",
+      "bytes": 86494,
+      "sha256": "41a8f6caa4ae1e844249a74ed16d18723cf7acf02ec4816309c16d2527911928"
+    },
+    {
+      "x": 2197,
+      "y": 1106,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2197/1106.webp",
+      "file": "are/12-2197-1106.webp",
+      "bytes": 93430,
+      "sha256": "9da88838d6df9b3044537f0f9c7fba309605742fbf0618c3c410a39946e9888b"
+    },
+    {
+      "x": 2195,
+      "y": 1107,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2195/1107.webp",
+      "file": "are/12-2195-1107.webp",
+      "bytes": 93756,
+      "sha256": "a83b6237a97770671532357b5aaac9989770ee03ae8da741cf8613256d1ea3ce"
+    },
+    {
+      "x": 2198,
+      "y": 1106,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2198/1106.webp",
+      "file": "are/12-2198-1106.webp",
+      "bytes": 53582,
+      "sha256": "dab99cca5a720ab1d8e6cf057e7f0bbfe38a4fc2b803edb2d480fad40a2e6b17"
+    },
+    {
+      "x": 2196,
+      "y": 1107,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2196/1107.webp",
+      "file": "are/12-2196-1107.webp",
+      "bytes": 86758,
+      "sha256": "d0af3278ddcce2a38b002e7e9efaa651c5b6f52e5f2e635e9f9d81f1fea8bdc4"
+    },
+    {
+      "x": 2197,
+      "y": 1107,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2197/1107.webp",
+      "file": "are/12-2197-1107.webp",
+      "bytes": 91896,
+      "sha256": "e933e7bf6ca414d815f3834f9f77c806d6810d12cfe78427b3de430b8cd85113"
+    },
+    {
+      "x": 2196,
+      "y": 1108,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2196/1108.webp",
+      "file": "are/12-2196-1108.webp",
+      "bytes": 91038,
+      "sha256": "0c5ded826085c84545d515fa016ae6a22368b22ef3d36c5250f7ba1996be4810"
+    },
+    {
+      "x": 2198,
+      "y": 1107,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2198/1107.webp",
+      "file": "are/12-2198-1107.webp",
+      "bytes": 85546,
+      "sha256": "e01c33179dfaa65cc056c552011954ca02d299018ecff118d8e5507c22ad32eb"
+    },
+    {
+      "x": 2197,
+      "y": 1108,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2197/1108.webp",
+      "file": "are/12-2197-1108.webp",
+      "bytes": 74552,
+      "sha256": "5a78f28581471243b6cc45304bad591ab412c6f05e86cf70f69b642c5694999f"
+    },
+    {
+      "x": 2195,
+      "y": 1108,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2195/1108.webp",
+      "file": "are/12-2195-1108.webp",
+      "bytes": 81924,
+      "sha256": "fa746da82e71807bb8f19d293c81217c17d5e5edfea470c47fa54a5bb90a9fee"
+    },
+    {
+      "x": 2198,
+      "y": 1108,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2198/1108.webp",
+      "file": "are/12-2198-1108.webp",
+      "bytes": 70932,
+      "sha256": "3db9fcb946c4d0d47728158084c43307180d029c7dfd5e458fb483a202bfb53f"
+    },
+    {
+      "x": 2195,
+      "y": 1109,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2195/1109.webp",
+      "file": "are/12-2195-1109.webp",
+      "bytes": 78116,
+      "sha256": "fbe2a811cd834088d48cad82c00128ca85a2916eb142730a16daf9b356dbd41f"
+    },
+    {
+      "x": 2197,
+      "y": 1109,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2197/1109.webp",
+      "file": "are/12-2197-1109.webp",
+      "bytes": 75784,
+      "sha256": "65dc52c1f6522f89bcca457a267a29bbdd4eb54b721c643f8d4cd27bed4914bf"
+    },
+    {
+      "x": 2196,
+      "y": 1109,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2196/1109.webp",
+      "file": "are/12-2196-1109.webp",
+      "bytes": 78914,
+      "sha256": "bce185c6cb819691aa5489b99cfbb04991ec2cb98118f61d00f141fd3e7cdf82"
+    },
+    {
+      "x": 2198,
+      "y": 1109,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2198/1109.webp",
+      "file": "are/12-2198-1109.webp",
+      "bytes": 75270,
+      "sha256": "32d3740a55b57f5e81bf536dc47d89c254ee37631b17bb268ddad536ba5f25e9"
+    },
+    {
+      "x": 2194,
+      "y": 1108,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2194/1108.webp",
+      "file": "are/12-2194-1108.webp",
+      "bytes": 84114,
+      "sha256": "06a26f35b91cec8ff36ffc90965b2f49c857e9f74138beab8d4460b10b629c38"
+    },
+    {
+      "x": 2194,
+      "y": 1109,
+      "z": 12,
+      "url": "https://tiles.mapterhorn.com/12/2194/1109.webp",
+      "file": "are/12-2194-1109.webp",
+      "bytes": 77360,
+      "sha256": "a0156166aef08572daafba3c1c4199b2fb2913c9acf14eca2026c12615930bae"
+    }
+  ]
+}
