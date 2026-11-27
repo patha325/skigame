@@ -23,8 +23,13 @@ jobs:
       - run: python -m unittest discover -s tests -p "*_test.py"
       - run: python -m py_compile launch.py bootstrap.py
   browser-and-build:
+    permissions:
+      contents: write
+    concurrency:
+      group: nordic-visual-review
+      cancel-in-progress: true
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -35,6 +40,19 @@ jobs:
       - run: python3 bootstrap.py
       - run: npm run build -- --output=nordic-line-0.2.0.zip
       - run: npm run build:site
+      - name: Prepare previous renderer for the visual comparison
+        run: git fetch --no-tags --depth=1 origin a66e4ec4031bd589c0d00ef8c80baacb509c2824
+      - name: Render the new art direction and its baseline
+        run: node tests/art-capture.mjs
+        env:
+          LOCAL_RIDE_BROWSER: /usr/bin/google-chrome
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Publish visual review images
+        if: always() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: node tools/publish_art_review.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
       - name: Test combined site and offline file in real Chromium
         run: npm run test:browser
         env:

@@ -12,7 +12,7 @@ const flag={SE:'🇸🇪',NO:'🇳🇴',AU:'🇦🇺'};
 const embeddedNode=$('embedded-data'),embedded=embeddedNode?JSON.parse(embeddedNode.textContent):null;
 const cache=new Map(),keys=new Set(),touch={steer:0};
 let catalog,profile,meta,terrain,skier,view,run,runIndex=0,routeCum=[],gates=[],nextGate=0;
-let state='loading',gear='snowboard',timed=true,started=false,changedSelection=false;
+let state='loading',gear='ski',timed=true,started=false,changedSelection=false;
 let accumulator=0,lastFrame=0,lastHud=0,lastMap=0,toastUntil=0,loadingSerial=0;
 let pendingBoost=false,pendingFlip=0,cameraMode='chase',lyingDown=false,modalState=null,relief;
 let history=[],historyAt=0,replay=null,lift=null,nordicPicker;

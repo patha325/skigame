@@ -1,4 +1,6 @@
 import * as THREE from './vendor/three.module.min.js';
+import {ArtPipeline} from './render-pipeline.mjs';
+import {snowPine,createRider,buildEquipment} from './game-art.mjs';
 
 const clamp=THREE.MathUtils.clamp;
 const UP=new THREE.Vector3(0,1,0);
@@ -29,100 +31,157 @@ export class MountainView{
   constructor(canvas){
     this.renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
     this.renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));this.renderer.setSize(innerWidth,innerHeight);
-    this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=.88;
+    this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.toneMapping=THREE.NoToneMapping;
     this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-    this.scene=new THREE.Scene();this.scene.fog=new THREE.Fog(0xbac4cf,1300,6000);
-    this.camera=new THREE.PerspectiveCamera(64,innerWidth/innerHeight,.15,42000);
-    this.hemi=new THREE.HemisphereLight(0xd7e7ff,0x71819a,1.25);this.scene.add(this.hemi);
-    this.sun=new THREE.DirectionalLight(0xffe0b3,2.9);this.sun.castShadow=true;this.sun.shadow.mapSize.set(1536,1536);
-    Object.assign(this.sun.shadow.camera,{left:-95,right:95,top:95,bottom:-95,near:10,far:650});this.sun.shadow.bias=-.0003;this.sun.shadow.normalBias=.045;this.sun.shadow.radius=2;
-    this.sun.shadow.camera.updateProjectionMatrix();
-    this.scene.add(this.sun,this.sun.target);this.root=new THREE.Group();this.scene.add(this.root);
+    this.scene=new THREE.Scene();this.scene.fog=new THREE.Fog(0xd4bdcd,1000,6500);
+    this.camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.12,42000);
+    this.hemi=new THREE.HemisphereLight(0xc0cbed,0x8e7495,2.05);this.scene.add(this.hemi);
+    this.sun=new THREE.DirectionalLight(0xffc18a,4.8);this.sun.castShadow=true;this.sun.shadow.mapSize.set(2048,2048);
+    Object.assign(this.sun.shadow.camera,{left:-72,right:72,top:72,bottom:-72,near:5,far:800});
+    this.sun.shadow.bias=-.00014;this.sun.shadow.normalBias=.035;this.sun.shadow.radius=3;
+    this.sun.shadow.camera.updateProjectionMatrix();this.scene.add(this.sun,this.sun.target);
+    this.fill=new THREE.DirectionalLight(0xe5dcea,1.0);this.scene.add(this.fill,this.fill.target);
+    this.root=new THREE.Group();this.scene.add(this.root);
     this.target=new THREE.Vector3();this.desired=new THREE.Vector3();this.normal=new THREE.Vector3();this.forward=new THREE.Vector3();this.right=new THREE.Vector3();this.matrix=new THREE.Matrix4();
-    this.cameraReady=false;this.time=0;this.frame=0;this.wide=false;this.cameraDistance=7.8;this.cameraHeight=3.0;this.trailN=0;this.trailClock=0;
-    this.makeSky();this.makeRider();
+    this.highQuality=true;this.sunDirection=new THREE.Vector3(.5,.14,-.85).normalize();this.mood='alpenglow';
+    this.cameraReady=false;this.time=0;this.frame=0;this.wide=false;this.cameraDistance=4.5;this.cameraHeight=3.1;this.trailN=0;this.trailClock=0;
+    this.makeSky();this.makeEnvironment();this.makeRider();this.pipeline=new ArtPipeline(this.renderer);
+    canvas.__mountainView=this;
   }
+
   makeSky(){
     this.skyMaterial=new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,fog:false,
-      uniforms:{uSun:{value:new THREE.Vector3(-.55,.55,-.65).normalize()},uWarm:{value:1}},
-      vertexShader:'varying vec3 skyWorld; void main(){vec4 p=modelMatrix*vec4(position,1.0);skyWorld=p.xyz;gl_Position=projectionMatrix*viewMatrix*p;}',
-      fragmentShader:`varying vec3 skyWorld; uniform vec3 uSun;uniform float uWarm;
-      float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-      float ns(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+1.),f.x),f.y);}
-      void main(){vec3 r=normalize(skyWorld-cameraPosition);float y=max(r.y,0.);float glow=pow(max(dot(r,uSun),0.),6.);
-        vec3 horizon=mix(vec3(.61,.68,.75),vec3(.80,.65,.58),uWarm*.55+glow*.25);
-        vec3 col=mix(horizon,vec3(.25,.40,.57),pow(clamp(y*1.5,0.,1.),.55));
-        vec2 p=r.xz/max(.16,r.y+.18)*3.;float cloud=ns(p)*.55+ns(p*2.1)*.28+ns(p*4.2)*.13;
-        cloud=smoothstep(.58,.76,cloud)*smoothstep(.02,.2,y)*.38;
-        col=mix(col,vec3(.93,.86,.80),cloud);col+=vec3(1.,.82,.63)*pow(max(dot(r,uSun),0.),250.)*.6;
-        col+=vec3(2.,1.6,1.1)*smoothstep(.9993,.9997,dot(r,uSun));gl_FragColor=vec4(col,1.);
-        #include <tonemapping_fragment>
-        #include <colorspace_fragment>
-      }`});
+      uniforms:{uSun:{value:this.sunDirection},uWarm:{value:1}},
+      vertexShader:'varying vec3 skyWorld;void main(){vec4 p=modelMatrix*vec4(position,1.);skyWorld=p.xyz;gl_Position=projectionMatrix*viewMatrix*p;}',
+      fragmentShader:`varying vec3 skyWorld;uniform vec3 uSun;uniform float uWarm;
+        float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+        float ns(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+1.),f.x),f.y);}
+        void main(){
+          vec3 r=normalize(skyWorld-cameraPosition);float y=max(r.y,0.);
+          float facing=pow(max(dot(normalize(r.xz),normalize(uSun.xz)),0.),9.);
+          float low=exp(-y*5.);vec3 zenith=mix(vec3(.10,.25,.57),vec3(.55,.24,.34),uWarm);
+          vec3 horizon=mix(vec3(.8,1.05,1.5),mix(vec3(.92,.56,.55),vec3(2.1,1.12,.45),facing),uWarm);
+          vec3 color=mix(zenith,horizon,low);
+          vec2 p=r.xz/max(.07,y+.07)*vec2(.25,2.4);
+          float clouds=ns(p*.8)*.56+ns(p*2.2)*.27+ns(p*5.4)*.12;
+          float wisps=smoothstep(.53,.73,clouds)*smoothstep(.012,.14,y);
+          color=mix(color,mix(vec3(1.4,1.45,1.6),vec3(1.45,.87,.83),uWarm),wisps*.45);
+          float s=max(dot(r,uSun),0.);color+=vec3(1.5,.92,.4)*pow(s,90.)*uWarm;
+          color+=vec3(25.,16.,7.)*smoothstep(.99990,.99997,s);
+          gl_FragColor=vec4(color,1.);
+          #include <colorspace_fragment>
+        }`});
     this.sky=new THREE.Mesh(new THREE.SphereGeometry(35000,32,16),this.skyMaterial);this.sky.frustumCulled=false;this.scene.add(this.sky);
   }
+  makeEnvironment(){
+    const c=document.createElement('canvas');c.width=256;c.height=128;const ctx=c.getContext('2d'),g=ctx.createLinearGradient(0,0,0,128);
+    g.addColorStop(0,'#9c9abb');g.addColorStop(.40,'#f1c9b5');g.addColorStop(.51,'#fff0d2');g.addColorStop(.56,'#b3bace');g.addColorStop(1,'#e1e6ef');ctx.fillStyle=g;ctx.fillRect(0,0,256,128);
+    const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.mapping=THREE.EquirectangularReflectionMapping;
+    const generator=new THREE.PMREMGenerator(this.renderer);this.environment=generator.fromEquirectangular(tex);this.scene.environment=this.environment.texture;tex.dispose();generator.dispose();
+  }
+
   clearWorld(){
     const textures=new Set();this.root.traverse(o=>{o.geometry?.dispose();for(const m of (Array.isArray(o.material)?o.material:[o.material])){if(!m)continue;m.map&&textures.add(m.map);m.dispose();}});
     textures.forEach(t=>t.dispose());this.pisteTexture?.dispose();this.root.clear();this.forest=null;this.markers=[];this.trails=[];
   }
   load(terrain,meta,profile){
     this.clearWorld();this.terrain=terrain;this.meta=meta;this.profile=profile;this.seed=[...profile.slug].reduce((s,c)=>(s*31+c.charCodeAt(0))|0,0);
-    this.scene.fog.near=1400;this.scene.fog.far=Math.max(5000,Math.min(10500,terrain.side*.9));
+    this.scene.fog.near=1100;this.scene.fog.far=Math.max(5000,Math.min(10500,terrain.side*1.1));
     this.makeTerrain();this.makeForest();this.makeLifts();this.makeTrails();this.cameraReady=false;this.forestCentre=null;
   }
+
   makeTerrain(){
     const t=this.terrain,n=Math.min(t.n-1,360),g=new THREE.PlaneGeometry(t.side,t.side,n,n);g.rotateX(-Math.PI/2);
-    const pos=g.attributes.position;
-    for(let i=0;i<pos.count;i++)pos.setY(i,t.height(pos.getX(i),pos.getZ(i)));
-    g.computeVertexNormals();const data=Float32Array.from(t.distances,v=>v/10);
-    this.pisteTexture=new THREE.DataTexture(data,t.n,t.n,THREE.RedFormat,THREE.FloatType);
+    const pos=g.attributes.position;for(let i=0;i<pos.count;i++)pos.setY(i,t.height(pos.getX(i),pos.getZ(i)));g.computeVertexNormals();
+    this.pisteTexture=new THREE.DataTexture(Float32Array.from(t.distances,v=>v/10),t.n,t.n,THREE.RedFormat,THREE.FloatType);
     this.pisteTexture.minFilter=THREE.LinearFilter;this.pisteTexture.magFilter=THREE.LinearFilter;this.pisteTexture.needsUpdate=true;
-    const mat=new THREE.MeshStandardMaterial({color:0xf0f0eb,roughness:.96,metalness:0});
+    const mat=new THREE.MeshStandardMaterial({color:0xf2f3fa,roughness:.62,metalness:0,envMapIntensity:.65});
     mat.onBeforeCompile=shader=>{
-      shader.uniforms.uPiste={value:this.pisteTexture};shader.uniforms.uSide={value:t.side};shader.uniforms.uGroom={value:this.groomDirection?.clone()??new THREE.Vector2(1,0)};this.snowShader=shader;
+      Object.assign(shader.uniforms,{uPiste:{value:this.pisteTexture},uSide:{value:t.side},uGroom:{value:this.groomDirection?.clone()??new THREE.Vector2(1,0)},uTreeline:{value:this.profile.forestLine}});
+      this.snowShader=shader;
       shader.vertexShader='varying vec3 snowWorld;\n'+shader.vertexShader;
       shader.vertexShader=shader.vertexShader.replace('#include <worldpos_vertex>','#include <worldpos_vertex>\nsnowWorld=(modelMatrix*vec4(transformed,1.)).xyz;');
-      shader.fragmentShader='varying vec3 snowWorld;uniform sampler2D uPiste;uniform float uSide;uniform vec2 uGroom;\n'+shader.fragmentShader;
+      shader.fragmentShader=`varying vec3 snowWorld;uniform sampler2D uPiste;uniform float uSide;uniform vec2 uGroom;uniform float uTreeline;
+        float grainSnow(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
+        vec3 snowBump(vec3 normalIn,float heightIn,vec3 viewPoint){
+          vec3 dx=dFdx(viewPoint),dy=dFdy(viewPoint);
+          vec3 rx=cross(dy,normalIn),ry=cross(normalIn,dx);float det=dot(dx,rx);
+          return normalize(abs(det)*normalIn-sign(det)*(dFdx(heightIn)*rx+dFdy(heightIn)*ry));
+        }
+      `+shader.fragmentShader;
       shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>',`#include <color_fragment>
-        float pd=texture2D(uPiste,(snowWorld.xz+uSide*.5)/uSide).r;
-        float groom=1.-smoothstep(13.,33.,pd);float stripe=dot(snowWorld.xz,uGroom)*52.;
-        float aa=1.-smoothstep(.7,3.,fwidth(stripe));float ripple=sin(stripe)*aa;
-        float grain=fract(sin(dot(floor(snowWorld.xz*17.),vec2(12.9898,78.233)))*43758.5453);
-        diffuseColor.rgb*=1.-groom*(.021+.027*ripple)-(.007+(.014*(1.-groom)))*grain;
-        diffuseColor.rgb=mix(diffuseColor.rgb*.965,diffuseColor.rgb,groom);
+        float pisteD=texture2D(uPiste,(snowWorld.xz+uSide*.5)/uSide).r;
+        float grooming=1.-smoothstep(17.,36.,pisteD);
+        float groovePhase=dot(snowWorld.xz,uGroom)*62.83185;
+        float grooveAA=1.-smoothstep(1.0,4.0,fwidth(groovePhase));
+        float ridge=cos(groovePhase);
+        float snowGrain=grainSnow(floor(snowWorld.xz*32.));
+        diffuseColor.rgb*=1.-grooming*grooveAA*(.055+.055*ridge);
+        diffuseColor.rgb*=.986+.018*snowGrain;
+        float farForest=smoothstep(300.,1500.,length(vViewPosition))*(1.-smoothstep(uTreeline-40.,uTreeline+40.,snowWorld.y))*smoothstep(32.,65.,pisteD);
+        diffuseColor.rgb=mix(diffuseColor.rgb,diffuseColor.rgb*vec3(.70,.77,.79),farForest*.36);
       `);
+      shader.fragmentShader=shader.fragmentShader.replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
+        float softDrifts=sin(snowWorld.x*.7+sin(snowWorld.z*.43))*sin(snowWorld.z*.57)*.012*(1.-grooming);
+        float grooveHeight=sin(groovePhase)*.0034*grooveAA*grooming+softDrifts;
+        normal=snowBump(normal,grooveHeight,-vViewPosition);
+      `);
+      shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\nroughnessFactor=mix(.76,.40,grooming);');
     };
     const snow=new THREE.Mesh(g,mat);snow.receiveShadow=true;this.root.add(snow);
   }
+
   makeForest(){
     const gum=this.profile.treeType==='eucalypt';
-    const material=new THREE.MeshLambertMaterial({vertexColors:true});
-    this.forest=new THREE.InstancedMesh(gum?gumGeometry():pineGeometry(),material,2400);
+    const material=(near,far)=>{
+      const m=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.9,envMapIntensity:.22});
+      m.onBeforeCompile=shader=>{
+        shader.uniforms.uForestNear={value:near};shader.uniforms.uForestFar={value:far};
+        shader.fragmentShader='uniform float uForestNear;uniform float uForestFar;\n'+shader.fragmentShader;
+        shader.fragmentShader=shader.fragmentShader.replace('#include <opaque_fragment>',`
+          float treeRange=length(vViewPosition);
+          float visibility=smoothstep(uForestNear,uForestNear+80.,treeRange)*(1.-smoothstep(uForestFar-90.,uForestFar,treeRange));
+          float screenNoise=fract(sin(dot(floor(gl_FragCoord.xy),vec2(12.9898,78.233)))*43758.5453);
+          if(screenNoise>visibility)discard;
+          #include <opaque_fragment>
+        `);
+      };return m;
+    };
+    this.forest=new THREE.InstancedMesh(gum?gumGeometry():snowPine(0),material(-100,365),1800);
     this.forest.castShadow=true;this.forest.receiveShadow=true;this.forest.instanceMatrix.setUsage(THREE.DynamicDrawUsage);this.forest.count=0;this.root.add(this.forest);
-    const far=new THREE.InstancedMesh(gum?gumGeometry(true):pineGeometry(true),new THREE.MeshLambertMaterial({vertexColors:true}),4200);
-    let n=0;const size=this.terrain.side*.95;
-    for(let i=0;i<19000&&n<4200;i++){
-      const x=(hash(i,3,this.seed)-.5)*size,z=(hash(i,7,this.seed)-.5)*size,y=this.terrain.height(x,z);
-      if(y>this.profile.forestLine||this.terrain.pisteDistance(x,z)<32)continue;
-      const s=8+hash(i,19,this.seed)*12;this.matrix.compose(new THREE.Vector3(x,y,z),new THREE.Quaternion().setFromAxisAngle(UP,hash(i,21)*6.28),new THREE.Vector3(s,s,s));far.setMatrixAt(n++,this.matrix);
+    this.middleForest=new THREE.InstancedMesh(gum?gumGeometry(true):snowPine(1),material(230,1150),11000);
+    this.middleForest.receiveShadow=true;this.middleForest.instanceMatrix.setUsage(THREE.DynamicDrawUsage);this.middleForest.count=0;this.root.add(this.middleForest);
+    const far=new THREE.InstancedMesh(gum?gumGeometry(true):snowPine(2),material(950,20000),38000);this.farForest=far;
+    let n=0;const size=this.terrain.side*.97,step=Math.max(17,size/Math.sqrt(78000)),count=Math.ceil(size/step);
+    for(let i=0;i<90000;i++){const row=i,col=i*3;
+      if(n>=30000)break;
+      const x=(hash(col,row,this.seed)-.5)*size,z=(hash(col,row,this.seed+17)-.5)*size,y=this.terrain.height(x,z);
+      if(y>this.profile.forestLine+(hash(col,row,4)-.5)*55||this.terrain.pisteDistance(x,z)<34)continue;
+      const s=10+hash(col,row,51)*11;this.matrix.compose(new THREE.Vector3(x,y,z),new THREE.Quaternion().setFromAxisAngle(UP,hash(col,row,56)*6.28),new THREE.Vector3(s*1.12,s,s*1.12));far.setMatrixAt(n++,this.matrix);
     }
-    far.count=n;far.computeBoundingSphere();this.root.add(far);
+    this.farTotal=n;far.count=this.highQuality?n:Math.min(n,13000);far.computeBoundingSphere();this.root.add(far);
   }
+
   refreshForest(x,z){
-    if(this.forestCentre&&Math.hypot(x-this.forestCentre.x,z-this.forestCentre.z)<190)return;
-    this.forestCentre={x,z};let n=0;const step=30,radius=820,cx=Math.floor(x/step),cz=Math.floor(z/step);
-    for(let j=cz-29;j<=cz+29;j++)for(let i=cx-29;i<=cx+29;i++){
-      if(n>=2400||hash(i,j,this.seed)<.17)continue;
-      const px=(i+(hash(i,j,11)-.5)*.8)*step,pz=(j+(hash(i,j,23)-.5)*.8)*step;
-      if(Math.hypot(px-x,pz-z)>radius||Math.abs(px)>this.terrain.half-35||Math.abs(pz)>this.terrain.half-35)continue;
-      const h=this.terrain.height(px,pz),line=this.profile.forestLine+(hash(i,j,5)-.5)*60;
-      if(h>line||this.terrain.pisteDistance(px,pz)<24+hash(i,j,7)*9)continue;
-      const [gx,gz]=this.terrain.gradient(px,pz);if(Math.hypot(gx,gz)>.85)continue;
-      const s=8+hash(i,j,41)*12,q=new THREE.Quaternion().setFromAxisAngle(UP,hash(i,j,39)*Math.PI*2);
-      this.matrix.compose(new THREE.Vector3(px,h,pz),q,new THREE.Vector3(s*(.8+hash(i,j,51)*.25),s,s));this.forest.setMatrixAt(n++,this.matrix);
-    }
-    this.forest.count=n;this.forest.instanceMatrix.needsUpdate=true;this.forest.computeBoundingSphere();
+    if(this.forestCentre&&Math.hypot(x-this.forestCentre.x,z-this.forestCentre.z)<95)return;
+    this.forestCentre={x,z};
+    const populate=(mesh,step,radius,inner,max)=>{
+      let n=0;const cx=Math.floor(x/step),cz=Math.floor(z/step),span=Math.ceil(radius/step);
+      for(let j=cz-span;j<=cz+span;j++)for(let i=cx-span;i<=cx+span;i++){
+        if(n>=max||hash(i,j,this.seed)<.11)continue;
+        const px=(i+(hash(i,j,11)-.5)*.88)*step,pz=(j+(hash(i,j,23)-.5)*.88)*step,d=Math.hypot(px-x,pz-z);
+        if(d>radius||d<inner||Math.abs(px)>this.terrain.half-20||Math.abs(pz)>this.terrain.half-20)continue;
+        const h=this.terrain.height(px,pz),line=this.profile.forestLine+(hash(i,j,5)-.5)*55;
+        if(h>line||this.terrain.pisteDistance(px,pz)<23+hash(i,j,7)*8)continue;
+        const [gx,gz]=this.terrain.gradient(px,pz);if(Math.hypot(gx,gz)>1.15)continue;
+        const s=9+hash(i,j,41)*11,q=new THREE.Quaternion().setFromAxisAngle(UP,hash(i,j,39)*Math.PI*2);
+        this.matrix.compose(new THREE.Vector3(px,h,pz),q,new THREE.Vector3(s*(.95+hash(i,j,51)*.25),s,s));mesh.setMatrixAt(n++,this.matrix);
+      }
+      mesh.count=n;mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();
+    };
+    populate(this.forest,10,350,0,this.highQuality?1400:700);populate(this.middleForest,15,1150,180,this.highQuality?7200:3600);
   }
+
   makeLifts(){
     this.liftPaths=[];const towers=[],chairs=[];
     for(const lift of this.meta.lifts){
@@ -159,84 +218,73 @@ export class MountainView{
       }total+=len;
     }
     const a=run.points[0],b=run.points[1],h=Math.atan2(b[0]-a[0],b[2]-a[2]);this.groomDirection=new THREE.Vector2(Math.cos(h),-Math.sin(h));this.snowShader?.uniforms.uGroom.value.copy(this.groomDirection);
+    this.runHeading=h;this.setWorldMood(this.mood);
     this.cameraReady=false;this.trailN=0;this.trailClock=0;for(const trail of this.trails??[])trail.geometry.setDrawRange(0,0);
   }
   makeTrails(){
     this.trails=[];for(let i=0;i<2;i++){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6000*3),3).setUsage(THREE.DynamicDrawUsage));g.setDrawRange(0,0);const line=new THREE.Line(g,new THREE.LineBasicMaterial({color:0x7893aa,transparent:true,opacity:.29}));line.frustumCulled=false;this.root.add(line);this.trails.push(line);}
   }
   makeRider(){
-    this.rider=new THREE.Group();this.pose=new THREE.Group();this.pose.position.y=.85;this.rider.add(this.pose);
-    this.human=new THREE.Group();this.human.position.y=-.85;this.gear=new THREE.Group();this.gear.position.y=-.85;this.pose.add(this.human,this.gear);this.scene.add(this.rider);
-    const mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.8});
-    const jacket=mat(0xcc507b),stripe=mat(0x387e9e),navy=mat(0x20354d),skin=mat(0xf1c2aa),yellow=mat(0xdba52c),snow=mat(0xf3efe8),lens=mat(0x293c52);
-    const part=(g,m,x,y,z,parent=this.human)=>{const mesh=new THREE.Mesh(g,m);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;};
-    this.torso=new THREE.Group();this.torso.position.set(0,.62,0);this.human.add(this.torso);
-    part(new THREE.CapsuleGeometry(.22,.23,6,12).scale(1.13,1,.82),jacket,0,.27,0,this.torso);
-    for(const y of [.17,.36])part(new THREE.CylinderGeometry(.229,.229,.075,16).scale(1.12,1,.83),stripe,0,y,0,this.torso);
-    part(new THREE.TorusGeometry(.19,.055,6,16).rotateX(Math.PI/2),snow,0,.56,0,this.torso);
-    this.head=new THREE.Group();this.head.position.set(0,.72,.015);this.torso.add(this.head);
-    part(new THREE.SphereGeometry(.24,20,14).scale(1,.96,.94),skin,0,0,0,this.head);
-    part(new THREE.SphereGeometry(.255,20,14,0,Math.PI*2,0,Math.PI*.56).scale(1,1.12,1),yellow,0,.035,0,this.head);
-    part(new THREE.CylinderGeometry(.259,.259,.095,20),yellow,0,.045,0,this.head);
-    part(new THREE.SphereGeometry(.075,12,8),snow,0,.335,0,this.head);
-    part(new THREE.SphereGeometry(.2,20,10).scale(1,.46,.35),snow,0,.005,.185,this.head);
-    part(new THREE.SphereGeometry(.176,20,10).scale(1,.40,.27),lens,0,.012,.212,this.head);
-    this.arms=[];
-    for(const s of [-1,1]){
-      const arm=new THREE.Group();arm.position.set(s*.27,.43,0);arm.rotation.z=s*.25;this.torso.add(arm);
-      part(new THREE.CapsuleGeometry(.09,.22,5,10),jacket,0,-.13,0,arm);
-      part(new THREE.SphereGeometry(.108,12,8),navy,0,-.35,.02,arm);this.arms.push(arm);
-    }
-    this.feet=[];for(const s of [-1,1]){
-      const leg=new THREE.Group();leg.position.set(s*.14,.15,0);this.human.add(leg);
-      part(new THREE.CapsuleGeometry(.105,.23,5,10),navy,0,.19,.035,leg);
-      part(new THREE.CapsuleGeometry(.09,.15,5,10).rotateX(Math.PI/2),snow,0,.01,.045,leg);this.feet.push(leg);
-    }
-    this.setGear('snowboard');
+    const rig=createRider();this.rider=rig.root;this.pose=rig.pose;this.human=rig.human;this.gear=rig.equipment;
+    this.torso=rig.torso;this.head=rig.head;this.arms=rig.arms;this.feet=rig.feet;
+    this.rider.scale.setScalar(1.08);this.scene.add(this.rider);this.setGear('ski');
   }
+
   setGear(mode){
-    this.mode=mode;this.gear.traverse(o=>{o.geometry?.dispose();o.material?.dispose();});this.gear.clear();
-    const boardMaterial=new THREE.MeshStandardMaterial({color:0x2d718c,roughness:.42});
-    const ski=(w,length,x)=>{const shape=new THREE.Shape();shape.moveTo(-w/2,-length/2+.18);shape.quadraticCurveTo(-w/2,-length/2,0,-length/2);shape.quadraticCurveTo(w/2,-length/2,w/2,-length/2+.18);shape.lineTo(w/2,length/2-.18);shape.quadraticCurveTo(w/2,length/2,0,length/2);shape.quadraticCurveTo(-w/2,length/2,-w/2,length/2-.18);shape.closePath();
-      const g=new THREE.ExtrudeGeometry(shape,{depth:.025,bevelEnabled:true,bevelSize:.015,bevelThickness:.01,bevelSegments:2,steps:1});g.rotateX(Math.PI/2);const m=new THREE.Mesh(g,boardMaterial);m.position.set(x,.105,0);m.castShadow=true;this.gear.add(m);};
-    if(mode==='ski'){ski(.12,1.75,-.14);ski(.12,1.75,.14);this.human.rotation.y=0;}
-    else {ski(.31,1.42,0);this.human.rotation.y=Math.PI/2;}
+    this.mode=mode;buildEquipment(this.gear,mode);this.human.rotation.y=mode==='snowboard'?Math.PI/2:0;
   }
+
   setWorldMood(mood){
-    const noon=mood==='day';this.skyMaterial.uniforms.uWarm.value=noon?.2:1;
-    this.sun.color.setHex(noon?0xfff1d5:0xffddb2);this.sun.intensity=noon?2.7:2.9;this.renderer.toneMappingExposure=noon?.93:.88;
+    this.mood=mood;const day=mood==='day';this.skyMaterial.uniforms.uWarm.value=day?0:1;
+    this.sun.color.setHex(day?0xfff0d8:0xffba7b);this.sun.intensity=day?3.8:4.8;
+    this.hemi.color.setHex(day?0xbcd7f7:0xc0cbed);this.hemi.groundColor.setHex(day?0x96a3ba:0x8e7495);
+    this.scene.fog.color.setHex(day?0xc3d3e7:0xd4bdcd);
+    if(this.runHeading!==undefined){const a=this.runHeading+.35,e=day ? .65:.13;this.sunDirection.set(Math.sin(a)*Math.cos(e),Math.sin(e),Math.cos(a)*Math.cos(e));}
   }
-  setQuality(quality){this.renderer.setPixelRatio(Math.min(devicePixelRatio,quality==='low'?1:1.5));this.renderer.shadowMap.enabled=quality!=='low';this.renderer.setSize(innerWidth,innerHeight);}
-  resize(){this.camera.aspect=innerWidth/innerHeight;this.camera.updateProjectionMatrix();this.renderer.setSize(innerWidth,innerHeight);}
+
+  setQuality(quality){
+    const high=quality!=='low';this.renderer.setPixelRatio(Math.min(devicePixelRatio,high?1.5:1));this.renderer.shadowMap.enabled=high;this.renderer.setSize(innerWidth,innerHeight);this.highQuality=high;this.pipeline.setQuality(high);this.forestCentre=null;if(this.farForest)this.farForest.count=high?this.farTotal:Math.min(this.farTotal,13000);
+  }
+
+  resize(){this.camera.aspect=innerWidth/innerHeight;this.camera.updateProjectionMatrix();this.renderer.setSize(innerWidth,innerHeight);this.pipeline.resize();}
+
   addTrail(actor,dt){
     this.trailClock+=dt;if(!actor.grounded||actor.speed<1||this.trailClock<.055)return;this.trailClock=0;if(this.trailN>=6000)this.trailN=0;
-    this.trails.forEach((line,i)=>{const side=(i-.5)*(this.mode==='ski'?.30:.16),x=actor.x+Math.cos(actor.heading)*side,z=actor.z-Math.sin(actor.heading)*side;
+    this.trails.forEach((line,i)=>{const side=(i-.5)*(this.mode==='ski' ? .30:.16),x=actor.x+Math.cos(actor.heading)*side,z=actor.z-Math.sin(actor.heading)*side;
       line.geometry.attributes.position.setXYZ(this.trailN,x,this.terrain.height(x,z)+.045,z);line.geometry.attributes.position.needsUpdate=true;line.geometry.setDrawRange(0,this.trailN+1);});this.trailN++;
   }
   update(dt,actor,input={},options={}){
     this.time+=dt;this.frame++;this.refreshForest(actor.x,actor.z);
-    const [gx,gz]=this.terrain.gradient(actor.x,actor.z);this.normal.set(-gx,1,-gz).normalize();if(!actor.grounded)this.normal.lerp(UP,.75).normalize();
-    this.forward.set(Math.sin(actor.heading),gx*Math.sin(actor.heading)+gz*Math.cos(actor.heading),Math.cos(actor.heading)).normalize();this.right.crossVectors(this.normal,this.forward).normalize();this.forward.crossVectors(this.right,this.normal).normalize();this.matrix.makeBasis(this.right,this.normal,this.forward);
-    this.rider.position.set(actor.x,actor.y+.025,actor.z);this.rider.quaternion.setFromRotationMatrix(this.matrix);
-    this.pose.rotation.y=actor.spin??0;this.pose.rotation.x=actor.flip??0;this.pose.rotation.z=(actor.lean??0)*.34;
-    this.torso.rotation.x=THREE.MathUtils.damp(this.torso.rotation.x,input.tuck?-.48:actor.charge?-.25:0,9,dt);
-    this.torso.position.y=THREE.MathUtils.damp(this.torso.position.y,(input.tuck||actor.charge>0) ? .53 : .62,9,dt);
-    const grab=!!actor.grab;
-    this.arms.forEach((arm,i)=>{arm.rotation.x=THREE.MathUtils.damp(arm.rotation.x,grab?-1.1:input.tuck?-.95:-.18,10,dt);arm.rotation.z=(i?1:-1)*(grab?.55:.25);});
+    const [gx,gz]=this.terrain.gradient(actor.x,actor.z),h=actor.heading,speed=Math.hypot(actor.vx,actor.vy,actor.vz);
+    this.rider.position.set(actor.x,actor.y+.025,actor.z);this.rider.quaternion.setFromAxisAngle(UP,h);
+    this.pose.rotation.y=actor.spin??0;this.pose.rotation.x=(actor.flip??0)-Math.atan(gx*Math.sin(h)+gz*Math.cos(h))*.12;this.pose.rotation.z=(actor.lean??0)*.23;
+    this.gear.rotation.x=-Math.atan(gx*Math.sin(h)+gz*Math.cos(h));this.gear.rotation.z=Math.atan(gx*Math.cos(h)-gz*Math.sin(h));
+    this.torso.rotation.x=THREE.MathUtils.damp(this.torso.rotation.x,input.tuck ? .38:actor.charge ? .20:.02,9,dt);
+    this.torso.position.y=THREE.MathUtils.damp(this.torso.position.y,(input.tuck||actor.charge>0) ? .67:.79,9,dt);
+    const grab=!!actor.grab;this.arms.forEach((arm,i)=>{arm.rotation.x=THREE.MathUtils.damp(arm.rotation.x,grab?-1.1:input.tuck ? .75:.08,10,dt);arm.rotation.z=(i?1:-1)*(grab ? .50:.14);});
     this.head.rotation.y=this.mode==='snowboard'?-Math.PI/2:0;
-    if(options.lieDown){this.rider.rotation.x=Math.PI/2;this.rider.position.y=actor.y+.25;}
-    this.rider.visible=options.camera!=='first';
-    const h=actor.heading,speed=Math.hypot(actor.vx,actor.vy,actor.vz),distance=this.cameraDistance+Math.min(4,speed*.09);
+    if(options.lieDown){this.rider.rotation.x=Math.PI/2;this.rider.position.y=actor.y+.30;}
+    this.rider.visible=options.camera!=='first';const distance=this.cameraDistance+Math.min(.65,speed*.016);
     if(options.map){this.desired.set(actor.x,actor.y+1100,actor.z-220);this.target.set(actor.x,actor.y,actor.z);}
-    else if(options.camera==='first'){this.desired.set(actor.x,actor.y+1.5,actor.z);this.target.set(actor.x+Math.sin(h)*25,actor.y+1.2,actor.z+Math.cos(h)*25);}
-    else if(options.camera==='side'){this.desired.set(actor.x+Math.cos(h)*12-Math.sin(h)*6,actor.y+4.1,actor.z-Math.sin(h)*12-Math.cos(h)*6);this.target.set(actor.x,actor.y+.9,actor.z);}
-    else{this.desired.set(actor.x-Math.sin(h)*distance,actor.y+this.cameraHeight+speed*.035,actor.z-Math.cos(h)*distance);this.target.set(actor.x+Math.sin(h)*10,actor.y+1.0,actor.z+Math.cos(h)*10);}
-    this.desired.y=Math.max(this.desired.y,this.terrain.height(this.desired.x,this.desired.z)+.75);
+    else if(options.camera==='first'){this.desired.set(actor.x,actor.y+2.05,actor.z);this.target.set(actor.x+Math.sin(h)*25,actor.y+1.6,actor.z+Math.cos(h)*25);}
+    else if(options.camera==='side'){this.desired.set(actor.x+Math.cos(h)*8-Math.sin(h)*3,actor.y+3.5,actor.z-Math.sin(h)*8-Math.cos(h)*3);this.target.set(actor.x,actor.y+1.1,actor.z);}
+    else{this.desired.set(actor.x-Math.sin(h)*distance,actor.y+this.cameraHeight+Math.min(.20,speed*.005),actor.z-Math.cos(h)*distance);this.target.set(actor.x+Math.sin(h)*10,actor.y+.60,actor.z+Math.cos(h)*10);}
+    this.desired.y=Math.max(this.desired.y,this.terrain.height(this.desired.x,this.desired.z)+.7);
     if(!this.cameraReady){this.camera.position.copy(this.desired);this.cameraReady=true;}else this.camera.position.lerp(this.desired,1-Math.exp(-6*dt));
-    this.camera.lookAt(this.target);const fov=this.wide?93:64+Math.min(6,speed*.12);this.camera.fov=THREE.MathUtils.damp(this.camera.fov,fov,6,dt);this.camera.updateProjectionMatrix();
+    this.camera.lookAt(this.target);const fov=this.wide?85:58+Math.min(3,speed*.05);this.camera.fov=THREE.MathUtils.damp(this.camera.fov,fov,6,dt);this.camera.updateProjectionMatrix();
     this.sky.position.copy(this.camera.position);
-    if(this.frame%8===1){const x=Math.round(actor.x/10)*10,z=Math.round(actor.z/10)*10;this.sun.position.set(x-190,actor.y+290,z-210);this.sun.target.position.set(x,actor.y,z);this.sun.target.updateMatrixWorld();}
+    if(this.frame%4===1){
+      const x=Math.round(actor.x/8)*8,z=Math.round(actor.z/8)*8;
+      this.sun.target.position.set(x,actor.y,z);this.sun.position.copy(this.sun.target.position).addScaledVector(this.sunDirection,350);this.sun.target.updateMatrixWorld();
+      this.fill.position.copy(this.camera.position).add(new THREE.Vector3(0,6,0));this.fill.target.position.set(actor.x,actor.y+1,actor.z);this.fill.target.updateMatrixWorld();
+    }
     if(options.recordTrail)this.addTrail(actor,dt);
-    this.renderer.render(this.scene,this.camera);
+    this.pipeline.render(this.scene,this.camera,this.sunDirection,this.mood==='day'?0:1);
+  }
+  photoMetrics(){
+    const bounds=new THREE.Box3().setFromObject(this.rider),points=[];
+    for(const x of [bounds.min.x,bounds.max.x])for(const y of [bounds.min.y,bounds.max.y])for(const z of [bounds.min.z,bounds.max.z])points.push(new THREE.Vector3(x,y,z).project(this.camera));
+    const minY=Math.min(...points.map(p=>p.y)),maxY=Math.max(...points.map(p=>p.y));
+    return {style:'sunset-helmet-0.3',mood:this.mood,cameraDistance:this.cameraDistance,riderScreenHeight:(maxY-minY)/2,trees:{near:this.forest.count,middle:this.middleForest.count,far:this.farForest.count},hdr:this.pipeline.hdr,triangles:this.renderer.info.render.triangles,drawCalls:this.renderer.info.render.calls};
   }
 }
