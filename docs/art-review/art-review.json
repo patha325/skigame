@@ -1,6 +1,6 @@
 {
-  "renderedUTC": "2026-11-27T11:32:33.581Z",
-  "sourceSHA": "374cd280825e09bfe410440a931fab8e46c42eea",
+  "renderedUTC": "2026-11-27T11:40:14.972Z",
+  "sourceSHA": "f96149cda61becaa0dc4a1fb58f54a66e0e6ad16",
   "baselineSHA": "a66e4ec4031bd589c0d00ef8c80baacb509c2824",
   "viewport": {
     "width": 2048,
@@ -17,15 +17,15 @@
         "style": "sunset-helmet-0.3",
         "mood": "alpenglow",
         "cameraDistance": 4.5,
-        "riderScreenHeight": 0.7123535625920542,
+        "riderScreenHeight": 0.7123524332707377,
         "trees": {
           "near": 1376,
           "middle": 7200,
           "far": 30000
         },
         "hdr": true,
-        "triangles": 3197962,
-        "drawCalls": 140
+        "triangles": 3197990,
+        "drawCalls": 143
       }
     },
     {
@@ -34,15 +34,15 @@
         "style": "sunset-helmet-0.3",
         "mood": "day",
         "cameraDistance": 4.5,
-        "riderScreenHeight": 0.7147895906418384,
+        "riderScreenHeight": 0.7147896081686642,
         "trees": {
           "near": 1376,
           "middle": 7200,
           "far": 30000
         },
         "hdr": true,
-        "triangles": 3197962,
-        "drawCalls": 140
+        "triangles": 3197990,
+        "drawCalls": 143
       }
     }
   ],
