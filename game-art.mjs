@@ -16,8 +16,8 @@ export function snowPine(level=0){
     for(let row=0;row<rows;row++){const ring=[];for(let j=0;j<sides;j++){
       const angle=j/sides*Math.PI*2+index*.63,rough=.89+artHash(j,index,5)*.22;
       const size=row===0 ? .035:row===rows-1?1:.67;
-      const radius=r*size*rough*(snow ? .88:1),droop=(row===rows-1?artHash(j,index,17)*.045:0);
-      ring.push([Math.cos(angle)*radius,y+(row===0?h:row===rows-1?0:h*.39)+(snow ? .024:0)-droop,Math.sin(angle)*radius]);
+      const radius=r*size*rough*(snow ? .94:1),droop=(row===rows-1?artHash(j,index,17)*.045:0);
+      ring.push([Math.cos(angle)*radius,y+(row===0?h:row===rows-1?0:h*.39)+(snow ? .05:0)-droop,Math.sin(angle)*radius]);
     }rings.push(ring);}
     const color=snow?white:(index%2?green:deep);
     for(let row=0;row<rows-1;row++)for(let j=0;j<sides;j++){const k=(j+1)%sides;tri(rings[row][j],rings[row+1][j],rings[row+1][k],color);tri(rings[row][j],rings[row+1][k],rings[row][k],color);}
@@ -26,16 +26,16 @@ export function snowPine(level=0){
   const trunk=new THREE.CylinderGeometry(.018,.032,.9,5).translate(0,.45,0).toNonIndexed();
   const tp=trunk.attributes.position,bark=new THREE.Color(0x736254);
   for(let i=0;i<(level===2?0:tp.count);i++){pos.push(tp.getX(i),tp.getY(i),tp.getZ(i));col.push(bark.r,bark.g,bark.b);}trunk.dispose();
-  for(let i=0;i<tiers;i++){const t=i/tiers,y=.13+t*.82,r=.275*Math.pow(1-t,.85),h=(level===2 ? .72:level===1 ? .49:.37)*(1-t*.32);crown(y,r,h,i,false);crown(y+.01,r,h*.94,i,true);}
+  for(let i=0;i<tiers;i++){const t=i/tiers,y=.13+t*.82,r=.275*Math.pow(1-t,.85),h=(level===2 ? .72:level===1 ? .49:.37)*(1-t*.32);crown(y,r,h,i,false);crown(y+.01,r,h,i,true);}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));g.computeVertexNormals();return g;
 }
 export function createRider(){
   const root=new THREE.Group(),pose=new THREE.Group(),human=new THREE.Group(),equipment=new THREE.Group();
   root.add(pose);pose.position.y=1.05;human.position.y=-1.05;equipment.position.y=-1.05;pose.add(human,equipment);
   const matte=color=>new THREE.MeshStandardMaterial({color,roughness:.73,envMapIntensity:.4});
-  const olive=matte(0x747869),cream=matte(0xe2e0d4),seam=matte(0x686c60),pants=matte(0x5c505c),boot=matte(0x383c44);
+  const olive=matte(0x747869),cream=matte(0xc7c4b7),seam=matte(0x686c60),pants=matte(0x9b929d),boot=matte(0x383c44);
   const red=new THREE.MeshPhysicalMaterial({color:0xc4543f,roughness:.58,clearcoat:.12}),flap=matte(0xdf6b50),pocket=matte(0x9d3b30);
-  const gold=new THREE.MeshPhysicalMaterial({color:0xf2b844,roughness:.28,metalness:.04,clearcoat:.75,clearcoatRoughness:.25,envMapIntensity:1.2});
+  const gold=new THREE.MeshPhysicalMaterial({color:0xdba047,roughness:.28,metalness:.04,clearcoat:.75,clearcoatRoughness:.25,envMapIntensity:1.2});
   const strap=matte(0x754c43),skin=matte(0xeec5ae),rubber=matte(0x51423f),white=matte(0xe7e6df);
   const glass=new THREE.MeshPhysicalMaterial({color:0x3c3446,roughness:.08,metalness:.3,clearcoat:1,envMapIntensity:1.2});
   const part=(g,m,x,y,z,parent=human)=>{const mesh=new THREE.Mesh(g,m);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh;};
@@ -73,7 +73,7 @@ export function createRider(){
     part(new THREE.SphereGeometry(.133,16,12).scale(1,1.08,.9),rubber,0,-.51,.04,arm);arms.push(arm);
     const leg=new THREE.Group();leg.position.set(s*.18,0,0);human.add(leg);
     part(new THREE.CapsuleGeometry(.139,.36,7,14),pants,0,.57,0,leg);
-    part(new THREE.CylinderGeometry(.136,.124,.23,16),cream,0,.31,.015,leg);
+    part(new THREE.CylinderGeometry(.136,.124,.23,16),boot,0,.31,.015,leg);
     part(roundedBox(.26,.25,.39,.07),boot,0,.15,.065,leg);
     for(const y of [.17,.23])part(roundedBox(.27,.029,.021,.009),white,0,y,.246,leg);
     part(roundedBox(.27,.052,.43,.02),rubber,0,.033,.075,leg);feet.push(leg);

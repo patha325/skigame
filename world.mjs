@@ -62,10 +62,10 @@ export class MountainView{
           float low=exp(-y*5.);vec3 zenith=mix(vec3(.10,.25,.57),vec3(.58,.23,.29),uWarm);
           vec3 horizon=mix(vec3(.8,1.05,1.5),mix(vec3(.92,.56,.55),vec3(2.2,.73,.16),facing),uWarm);
           vec3 color=mix(zenith,horizon,low);
-          vec2 p=r.xz/max(.07,y+.07)*vec2(.25,2.4);
+          vec2 p=vec2(atan(r.x,r.z)*2.8,y*28.);
           float clouds=ns(p*.8)*.56+ns(p*2.2)*.27+ns(p*5.4)*.12;
           float wisps=smoothstep(.53,.73,clouds)*smoothstep(.012,.14,y);
-          color=mix(color,mix(vec3(1.4,1.45,1.6),vec3(1.45,.87,.83),uWarm),wisps*.45);
+          color=mix(color,mix(vec3(1.4,1.45,1.6),vec3(1.45,.87,.83),uWarm),wisps*.30);
           float s=max(dot(r,uSun),0.);color+=vec3(1.5,.92,.4)*pow(s,90.)*uWarm;
           color+=vec3(25.,16.,7.)*smoothstep(.99990,.99997,s);
           gl_FragColor=vec4(color,1.);
@@ -95,7 +95,7 @@ export class MountainView{
     const pos=g.attributes.position;for(let i=0;i<pos.count;i++)pos.setY(i,t.height(pos.getX(i),pos.getZ(i)));g.computeVertexNormals();
     this.pisteTexture=new THREE.DataTexture(Float32Array.from(t.distances,v=>v/10),t.n,t.n,THREE.RedFormat,THREE.FloatType);
     this.pisteTexture.minFilter=THREE.LinearFilter;this.pisteTexture.magFilter=THREE.LinearFilter;this.pisteTexture.needsUpdate=true;
-    const mat=new THREE.MeshStandardMaterial({color:0xf2f3fa,roughness:.62,metalness:0,envMapIntensity:.65});
+    const mat=new THREE.MeshPhysicalMaterial({color:0xf2f3fa,roughness:.75,metalness:0,specularIntensity:.18,envMapIntensity:.45});
     mat.onBeforeCompile=shader=>{
       Object.assign(shader.uniforms,{uPiste:{value:this.pisteTexture},uSide:{value:t.side},uGroom:{value:this.groomDirection?.clone()??new THREE.Vector2(1,0)},uTreeline:{value:this.profile.forestLine}});
       this.snowShader=shader;
@@ -126,7 +126,7 @@ export class MountainView{
         float grooveHeight=sin(groovePhase)*.0034*grooveAA*grooming+softDrifts;
         normal=snowBump(normal,grooveHeight,-vViewPosition);
       `);
-      shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\nroughnessFactor=mix(.76,.40,grooming);');
+      shader.fragmentShader=shader.fragmentShader.replace('#include <roughnessmap_fragment>','#include <roughnessmap_fragment>\nroughnessFactor=mix(.86,.69,grooming);');
     };
     const snow=new THREE.Mesh(g,mat);snow.receiveShadow=true;this.root.add(snow);
   }
@@ -228,7 +228,7 @@ export class MountainView{
     for(let i=1;i<run.points.length&&placed<3;i++){
       const a=run.points[i-1],b=run.points[i],dx=b[0]-a[0],dz=b[2]-a[2],len=Math.hypot(dx,dz);distance+=len;
       if(len<5||distance<25+placed*230)continue;
-      const tx=dx/len,tz=dz/len,x=a[0]+tx*6+tz*24,z=a[2]+tz*6-tx*24;
+      const tx=dx/len,tz=dz/len,x=a[0]+tx*6-tz*24,z=a[2]+tz*6+tx*24;
       const start=this.terrain.height(x,z),end=this.terrain.height(x+tx*12,z+tz*12),middle=(start+end)/2;
       const fence=new THREE.Mesh(new THREE.PlaneGeometry(12,1.15),net);fence.position.set(x+tx*6,middle+.8,z+tz*6);fence.rotation.y=Math.atan2(-tz,tx);fence.rotation.z=Math.atan2(end-start,12);this.markerGroup.add(fence);
       for(const f of [0,.5,1]){const px=x+tx*12*f,pz=z+tz*12*f,pole=new THREE.Mesh(new THREE.CylinderGeometry(.052,.052,1.65,6),post);pole.position.set(px,this.terrain.height(px,pz)+.825,pz);pole.castShadow=true;this.markerGroup.add(pole);}

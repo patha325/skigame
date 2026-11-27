@@ -2,13 +2,13 @@
 
 A local skiing and snowboarding game that combines the Nordic resort explorer with the newer free-moving mountain prototype. One Three.js renderer and 120 Hz heightfield simulation power both datasets.
 
-![Combined mountain game](docs/combined-gameplay.png)
+![Actual 0.3 gameplay capture](https://raw.githubusercontent.com/patha325/skigame/codex/art-review-assets/docs/art-review/art-sunset.jpg)
 
 [View the preserved Nordic explorer](docs/combined-map.png) · [Local browser verification](docs/verification-0.2.json)
 
 ## Play on Windows or macOS
 
-Download and extract the **nordic-line-0.2.0.zip** build artifact from a successful GitHub Actions run. Double-click **Nordic-Line-Offline.html** to play Romme Alpin, Åre, Trysil and Thredbo immediately. This file includes its renderer, terrain and mapped slopes; it needs a modern WebGL 2 browser and makes no network requests. A GPU is recommended.
+Download and extract the **nordic-line-0.3.0.zip** build artifact from a successful GitHub Actions run. Double-click **Nordic-Line-Offline.html** to play Romme Alpin, Åre, Trysil and Thredbo immediately. This file includes its renderer, terrain and mapped slopes; it needs a modern WebGL 2 browser and makes no network requests. A GPU is recommended.
 
 For the full Nordic map, double-click **Start-Windows.bat** on Windows or **Start Nordic Line.command** on macOS. Python 3 is required for these launchers. Alternatively run `python3 launch.py` (`py -3 launch.py` on Windows). Keep the server window open while playing. The launcher verifies its libraries and downloads any missing files from pinned distributions. After those files are prepared, the map and cached terrain work offline. `node serve.mjs` is another option after `python3 bootstrap.py` has prepared Leaflet.
 
@@ -22,6 +22,12 @@ The repository source ZIP contains the game and data. The Actions build artifact
 - **Four featured mountains:** Romme Alpin, Åre, Trysil and Thredbo, with fully bundled elevation and mapped pistes. The Nordic explorer can load the other resorts into the same engine.
 
 The graphics are an independent procedural interpretation of the reference style. They do not reproduce Bonvo's proprietary artwork or application code. Equipment, cameras, snow, trees and lift structures are illustrative.
+
+## Art direction in 0.3
+
+The renderer now uses a close rear camera, an original rounded helmet/olive jacket/red backpack rider, low golden sunlight, a pink sky, cool shadows, procedural corduroy normals and a denser forest with three levels of detail. HDR rendering adds soft highlight bloom. A daylight preset and a lighter graphics setting remain available. Lift padding and safety nets are illustrative generated scenery.
+
+`tests/art-capture.mjs` renders real gameplay at 2048 × 780, alongside the previous renderer, and records camera framing, forest population and shader errors. The workflow uploads these captures and publishes review copies to the separate `codex/art-review-assets` branch. No generated concept image or reference screenshot is used as a game texture. Geometry checks cover finite vertices, unit normals, rider bounds and the distant-tree triangle budget.
 
 ## Controls
 
